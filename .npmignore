@@ -50,7 +50,6 @@ cc_mcp_config.json
 # Specs and logs
 specs/
 logs
-scripts/
 
 # Exclude generated skills (users should generate their own)
 .roo/skills/codebase-researcher/

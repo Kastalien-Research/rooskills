@@ -15,6 +15,8 @@ An NPM package and template that enables Roo Code users to leverage [Anthropic's
 - **🤖 Automated Generation** - Create new skills from any documentation URL
 - **📚 Pre-built Skills** - Ready-to-use skills for development, AI automation, and documentation
 - **🔧 CLI Tools** - Simple commands for initialization and skill generation
+- **⚡ Batch Automation** - Run multiple research iterations in parallel with Sequential Feynman Batch Executor
+- **🔬 Deep Research** - Automated deep-learning workflows with validation and artifact collection
 
 ## Quick Start
 
@@ -73,6 +75,49 @@ All skills are located in [`.roo/skills/`](.roo/skills/) and registered as custo
 
 #### Documentation
 - **architecture** - Architecture documentation for the skill generation system
+
+## Automation Scripts
+
+### Sequential Feynman Batch Executor
+
+Run multiple deep research iterations automatically with the Sequential Feynman workflow:
+
+```bash
+# Basic usage - single iteration
+./scripts/feynman-batch.sh "distributed tracing systems"
+
+# Multiple iterations for comparative analysis
+./scripts/feynman-batch.sh "React Server Components" 3
+
+# Parallel execution (2 concurrent iterations)
+./scripts/feynman-batch.sh "MCP architecture" 5 --parallel 2
+
+# Background execution
+nohup ./scripts/feynman-batch.sh "WebAssembly optimization" 3 > batch.log 2>&1 &
+```
+
+**Features:**
+- ⚡ Parallel or sequential execution modes
+- 🔄 Automatic retry logic (3 attempts per iteration)
+- 📊 Real-time progress tracking via STATUS.json
+- 📝 Comprehensive summary reports
+- 🎯 Artifact collection (notebooks, skills, outputs)
+- ⏱️ Configurable timeouts and concurrency
+
+**Output Structure:**
+```
+feynman-batch-outputs/
+  [run-id]/
+    iteration-1/
+      output.json
+      artifacts/
+        feynman-*.ipynb
+        skill-name/
+    STATUS.json
+    REPORT.md
+```
+
+See [`scripts/README-feynman-batch.md`](scripts/README-feynman-batch.md) for complete documentation.
 
 ## Advanced Usage
 
