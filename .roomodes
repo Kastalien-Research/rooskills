@@ -259,6 +259,78 @@
         "edit"
       ],
       "source": "project"
+    },
+    {
+      "slug": "cursor-skills",
+      "name": "🎯 Cursor Skills",
+      "roleDefinition": "Cursor is an AI-powered code editor and development environment that combines intelligent coding assistance with enterprise-grade features and workflow automation. It extends beyond basic AI code comp",
+      "skill_ref": {
+        "path": ".roo/skills/cursor-skills/SKILL.md",
+        "merge_strategy": "override"
+      },
+      "groups": [
+        "read",
+        "edit"
+      ],
+      "source": "project"
+    },
+    {
+      "slug": "spec-writer",
+      "name": "📝 Specification Writer",
+      "roleDefinition": "You write high-quality technical specifications, architecture documents, and design proposals that communicate complex systems, design decisions, and implementation strategies effectively.",
+      "skill_ref": {
+        "path": ".roo/skills/spec-writer/SKILL.md",
+        "merge_strategy": "override"
+      },
+      "groups": [
+        "read",
+        "edit"
+      ],
+      "source": "project"
+    },
+    {
+      "slug": "skill-creator",
+      "name": "🎯 Skill Creator",
+      "roleDefinition": "You create high-quality skills from web documentation using AI-powered extraction, research, and synthesis.",
+      "skill_ref": {
+        "path": ".roo/skills/skill-creator/SKILL.md",
+        "merge_strategy": "override"
+      },
+      "groups": [
+        "read",
+        "edit"
+      ],
+      "source": "project"
+    },
+    {
+      "slug": "model-enhancement-mcp",
+      "name": "🎯 Model Enhancement MCP",
+      "roleDefinition": "You create high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools. You build MCP servers in Python (FastMCP) or Node/TypeScript (MCP SDK).",
+      "skill_ref": {
+        "path": ".roo/skills/model-enhancement-mcp/SKILL.md",
+        "merge_strategy": "override"
+      },
+      "groups": [
+        "read",
+        "edit",
+        "command",
+        "mcp"
+      ],
+      "source": "project"
+    },
+    {
+      "slug": "gemini-cli",
+      "name": "🎯 Gemini Cli",
+      "roleDefinition": "Gemini CLI is a command-line interface tool that provides direct access to Google's Gemini AI models through the terminal, designed specifically for developers and technical professionals. It serves a",
+      "skill_ref": {
+        "path": ".roo/skills/gemini-cli/SKILL.md",
+        "merge_strategy": "override"
+      },
+      "groups": [
+        "read",
+        "edit"
+      ],
+      "source": "project"
     }
   ]
 }
