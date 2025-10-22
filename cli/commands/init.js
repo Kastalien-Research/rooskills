@@ -123,6 +123,7 @@ async function initCommand(options) {
     console.log(chalk.gray('  rooskills generate <documentation-url> [skill-name]\n'));
     console.log(chalk.gray('List available skills:'));
     console.log(chalk.gray('  rooskills list\n'));
+    console.log(chalk.cyan('💡 Activate skills: Mention skill name in chat or use Roo Code mode selector\n'));
 
   } catch (error) {
     console.error(chalk.red('\n❌ Error during initialization:'), error.message);

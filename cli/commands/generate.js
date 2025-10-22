@@ -43,7 +43,8 @@ async function generateCommand(url, skillName, options) {
     }
 
     console.log(chalk.green.bold('\n✨ Skill generation complete!\n'));
-    console.log(chalk.cyan('The new skill has been added to .roo/skills/ and registered in .roomodes\n'));
+    console.log(chalk.cyan('The new skill has been added to .roo/skills/ and registered in .roomodes'));
+    console.log(chalk.cyan('💡 Activate it: Mention the skill name in chat or use Roo Code mode selector\n'));
 
   } catch (error) {
     spinner.fail(chalk.red('✗ Skill generation failed'));
