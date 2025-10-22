@@ -1,0 +1,113 @@
+# https://cursor.com/docs llms.txt
+
+- [Cursor AI Editor Documentation](https://cursor.com/docs): Complete documentation for Cursor AI-powered code editor with guides, features, and integrations.
+- [CLI Authentication Methods](https://cursor.com/docs/cli/reference/authentication): Guide to Cursor CLI authentication using browser login or API keys for secure access.
+- [Bugbot Pull Request Review](https://cursor.com/docs/bugbot): Automated pull request analysis tool identifying bugs, security issues, and code quality problems.
+- [Enterprise Cursor Deployment Patterns](https://cursor.com/docs/enterprise/deployment-patterns): Guide for deploying Cursor IDE and CLI tools to developer machines using MDM systems and policies.
+- [Translate Keys CLI Workflow](https://cursor.com/docs/cli/cookbook/translate-keys): Automate i18n key detection and translation filling in pull requests using Cursor CLI.
+- [CLI Configuration Reference](https://cursor.com/docs/cli/reference/configuration): Configure Agent CLI using cli-config.json with settings, permissions, and model selection.
+- [Memories Context Management](https://cursor.com/docs/context/memories): Automatically generated rules from conversations maintaining project context across sessions.
+- [Automated Code Review Setup](https://cursor.com/docs/cli/cookbook/code-review): Set up automated code review using Cursor CLI in GitHub Actions with agent permissions and workflow configuration.
+- [Enterprise Network Configuration](https://cursor.com/docs/enterprise/network-configuration): Configure Cursor for enterprise networks including proxies, firewalls, and encryption requirements.
+- [Linear Integration Guide](https://cursor.com/docs/integrations/linear): Connect Linear issues to Cursor Background Agents for automated development work delegation and PR creation.
+- [Cursor Keyboard Shortcuts](https://cursor.com/docs/configuration/kbd): Complete guide to keyboard shortcuts and keybindings for Cursor editor features.
+- [Export Agent Chat Conversations](https://cursor.com/docs/agent/chat/export): Export Agent chats as markdown files for sharing and documentation purposes.
+- [Analytics v2 Infrastructure Update](https://cursor.com/docs/account/teams/analytics-v2): New analytics infrastructure tracking metrics for accepted code lines and tab usage accurately.
+- [Cursor Agent Overview](https://cursor.com/docs/agent/overview): Comprehensive guide to Cursor's autonomous coding assistant capabilities and features.
+- [Fix CI Failures Automation](https://cursor.com/docs/cli/cookbook/fix-ci): Automate CI failure detection and fixes using Cursor CLI in GitHub Actions workflows.
+- [Java Configuration Guide](https://cursor.com/docs/configuration/languages/java): Configure Cursor for Java development with JDK setup, extensions, debugging, and build tools.
+- [Update Docs CLI Cookbook](https://cursor.com/docs/cli/cookbook/update-docs): Automate documentation updates using Cursor CLI in GitHub Actions workflows.
+- [Background Agents API Endpoints](https://cursor.com/docs/background-agent/api/endpoints): Complete REST API reference for managing and querying background agents with endpoints documentation.
+- [Max Mode Context Window](https://cursor.com/docs/context/max-mode): Enable maximum context windows for AI models to process larger codebases efficiently.
+- [Enterprise LLM Safety Controls](https://cursor.com/docs/enterprise/llm-safety-and-controls): Configure security controls and steering mechanisms to manage AI agent behavior safely and effectively.
+- [Team Dashboard Management](https://cursor.com/docs/account/teams/dashboard): Manage team billing, usage tracking, members, settings, and integrations from dashboard.
+- [Agent Review Interface Guide](https://cursor.com/docs/agent/review): Review code changes with diffs, accept or reject modifications, and use Agent Review to catch bugs automatically.
+- [Supported AI Models](https://cursor.com/docs/models): Comprehensive guide to available coding models, pricing, context windows, and capabilities.
+- [Enterprise Privacy Data Governance](https://cursor.com/docs/enterprise/privacy-and-data-governance): Understand data flows, privacy guarantees, compliance standards, and encryption for Cursor enterprise security.
+- [iOS macOS Swift Configuration](https://cursor.com/docs/configuration/languages/ios-macos-swift): Configure Swift development environment in Cursor for iOS and macOS applications.
+- [Data Science Configuration Tools](https://cursor.com/docs/configuration/tools/data-science): Configure Cursor for data science with notebooks, databases, visualization, and reproducible environments.
+- [CLI Permissions Configuration](https://cursor.com/docs/cli/reference/permissions): Configure agent permissions using tokens for shell commands, file reads, and writes.
+- [Chat Message Summarization](https://cursor.com/docs/agent/chat/summarization): Learn how Cursor automatically summarizes conversations and condenses files to manage context efficiently.
+- [Enterprise Usage and Spend Controls](https://cursor.com/docs/enterprise/usage-and-spend-controls): Configure usage-based pricing, set spending limits, and monitor team AI costs.
+- [Cursor CLI GitHub Actions](https://cursor.com/docs/cli/github-actions): Integrate Cursor CLI into GitHub Actions and CI/CD systems to automate development tasks efficiently.
+- [Getting Request ID](https://cursor.com/docs/troubleshooting/request-reporting): Learn how to find and retrieve request IDs for troubleshooting issues with Cursor support.
+- [Secret Audit CLI](https://cursor.com/docs/cli/cookbook/secret-audit): Audit repositories for security vulnerabilities and secrets exposure using Cursor CLI automation.
+- [Agent Planning Features](https://cursor.com/docs/agent/planning): Learn how Agent plans complex tasks with structured to-do lists and message queuing capabilities.
+- [Team Members and Roles](https://cursor.com/docs/account/teams/members): Manage team members, assign roles, configure security settings, and handle billing.
+- [Cursor CLI Installation Guide](https://cursor.com/docs/cli/installation): Instructions for installing Cursor CLI on macOS, Linux, Windows WSL with verification and setup.
+- [AI Code Tracking API](https://cursor.com/docs/account/teams/ai-code-tracking-api): Track AI-generated code analytics per commit with granular accepted changes metrics.
+- [CLI Parameters Reference](https://cursor.com/docs/cli/reference/parameters): Complete reference guide for Cursor Agent CLI options, commands, and arguments.
+- [Cursor Rules Documentation](https://cursor.com/docs/context/rules): System-level instructions for Agent and Inline Edit with project, user, and team rule types.
+- [Cursor Billing Management](https://cursor.com/docs/account/billing): Manage subscriptions, invoices, payment methods, and billing cycles for Cursor accounts.
+- [Team SSO Configuration](https://cursor.com/docs/account/teams/sso): Set up SAML 2.0 single sign-on for Cursor team members using your identity provider.
+- [JetBrains to Cursor Migration](https://cursor.com/docs/configuration/migrations/jetbrains): Guide for migrating from JetBrains IDEs to Cursor with extensions, shortcuts, and themes.
+- [Using Agent in CLI](https://cursor.com/docs/cli/using): Guide to using Cursor's CLI agent with prompting, rules, MCP integration, and command approval.
+- [Agent Chat History Management](https://cursor.com/docs/agent/chat/history): Access, manage, and reference past Agent conversations from the history panel locally.
+- [Inline Edit Overview](https://cursor.com/docs/inline-edit/overview): Edit code directly in editor using Cmd+K with multiple modes for selections, questions, and full file edits.
+- [CLI Output Format Reference](https://cursor.com/docs/cli/reference/output-format): Cursor Agent CLI output formats including JSON, stream JSON, and text options for programmatic and human-readable results.
+- [VS Code Migration Guide](https://cursor.com/docs/configuration/migrations/vscode): Import VS Code settings, extensions, themes, and keybindings into Cursor easily.
+- [@ Symbols Context Reference](https://cursor.com/docs/context/symbols): Guide to using @ symbols for referencing files, code, documentation, and context in Cursor.
+- [Agent Chat Checkpoints](https://cursor.com/docs/agent/chat/checkpoints): Automatic snapshots of Agent codebase changes allowing users to undo modifications.
+- [JavaScript TypeScript Configuration](https://cursor.com/docs/configuration/languages/javascript-typescript): Configure Cursor for JavaScript and TypeScript development with essential extensions and framework support.
+- [Update Access Channels](https://cursor.com/docs/account/update-access): Configure Cursor update channels between stable default releases and early access beta versions.
+- [Shell Commands Configuration](https://cursor.com/docs/configuration/shell): Install and use CLI commands to open files and folders from terminal.
+- [SCIM User Provisioning Setup](https://cursor.com/docs/account/teams/scim): Configure SCIM 2.0 provisioning to automatically manage team members and directory groups through your identity provider.
+- [Enterprise Security and Controls](https://cursor.com/docs/enterprise): Enterprise-grade security, compliance, and administrative controls for organizations deploying AI-assisted development.
+- [MCP Servers Directory](https://cursor.com/docs/context/mcp/directory): Browse and install all supported Model Context Protocol servers available in Cursor.
+- [Agent Chat Commands](https://cursor.com/docs/agent/chat/commands): Create reusable custom commands triggered with slash prefix in chat input box.
+- [Enterprise Identity Access Management](https://cursor.com/docs/enterprise/identity-and-access-management): Configure SSO, SCIM provisioning, RBAC, and MDM policies for organizational access control.
+- [Tab Autocompletion Guide](https://cursor.com/docs/tab/overview): Learn about Tab, Cursor's specialized autocompletion model with multi-line suggestions and cross-file editing capabilities.
+- [Mermaid Diagrams Configuration](https://cursor.com/docs/configuration/tools/mermaid-diagrams): Generate architectural diagrams using Mermaid to visualize code structure and data flow.
+- [Agent Modes Documentation](https://cursor.com/docs/agent/modes): Explore different agent modes optimized for specific coding tasks and workflows.
+- [Cursor Pricing Plans](https://cursor.com/docs/account/pricing): Explore Cursor's free and paid pricing plans including individual, team, and enterprise options with usage details.
+- [Git Integration Features](https://cursor.com/docs/integrations/git): AI-powered Git features including automatic commit message generation and intelligent merge conflict resolution.
+- [Cursor Download Options](https://cursor.com/docs/downloads): Download Cursor for Windows, macOS, and Linux with native installers and package manager support.
+- [Reuse Existing Code](https://cursor.com/docs/reuse-existing-code): Configure Cursor AI to search existing code before generating new solutions and prevent duplicates.
+- [Background Agent Webhooks](https://cursor.com/docs/background-agent/api/webhooks): Configure and verify webhooks for background agent status change notifications and events.
+- [Deeplinks Integration Guide](https://cursor.com/docs/integrations/deeplinks): Share prompts and commands with others using deeplinks for collaboration and knowledge sharing.
+- [Agent Tools Reference](https://cursor.com/docs/agent/tools): Complete guide to all available tools for Agent modes including search, edit, run, and MCP capabilities.
+- [Agent Security Guardrails](https://cursor.com/docs/agent/security): Learn about Cursor's security guardrails protecting agents from prompt injection and unauthorized actions.
+- [AI Commit Message Generation](https://cursor.com/docs/more/ai-commit-message): Generate commit messages automatically from staged changes using AI technology.
+- [Cursor CLI Overview](https://cursor.com/docs/cli/overview): Terminal-based AI agent for writing, reviewing, and modifying code interactively.
+- [Web Development Configuration Guide](https://cursor.com/docs/configuration/tools/web-development): Configure Cursor for web development with Linear, Figma, browser tools integration.
+- [MCP Extension API Reference](https://cursor.com/docs/context/mcp-extension-api): Programmatic API to register and manage MCP servers dynamically without modifying configuration files.
+- [Cursor Extensions Configuration](https://cursor.com/docs/configuration/extensions): Install, manage, and configure VS Code extensions in Cursor with marketplace access and verification.
+- [Large Codebases Configuration](https://cursor.com/docs/configuration/tools/large-codebases): Techniques and best practices for managing large codebases with Cursor effectively.
+- [Configuring Ignore Files](https://cursor.com/docs/context/ignore-files): Control which files and directories Cursor indexes using .cursorignore for security and performance.
+- [AI Resolve Merge Conflicts](https://cursor.com/docs/more/ai-merge-conflicts): Use Cursor Agent to automatically resolve merge conflicts by analyzing both versions and proposing solutions.
+- [Enterprise Identity Access Management](https://cursor.com/docs/enterprise/identity-and-access-management#mdm-policies): Configure SSO, SCIM provisioning, RBAC, and MDM policies for enterprise organizations.
+- [Slack Integration Guide](https://cursor.com/docs/integrations/slack): Set up Cursor's Slack integration to run Background Agents directly from Slack conversations.
+- [Teams Setup Guide](https://cursor.com/docs/account/teams/setup): Create and configure Cursor teams with SSO, member invitations, and billing management.
+- [Agent Chat Tabs Management](https://cursor.com/docs/agent/chat/tabs): Create, manage, and organize multiple chat tabs with separate conversation histories and contexts.
+- [Duplicate Chat Conversations](https://cursor.com/docs/agent/chat/duplicate): Learn how to duplicate chats to explore alternative solutions while preserving original conversations.
+- [Agent Browser Automation](https://cursor.com/docs/agent/browser): Browser automation tool for testing, accessibility audits, design conversion, and web application debugging.
+- [Enterprise Compliance Monitoring](https://cursor.com/docs/enterprise/compliance-and-monitoring): Audit logs, AI code tracking, certifications, and regulatory compliance requirements documentation.
+- [Python Configuration Guide](https://cursor.com/docs/configuration/languages/python): Setup Cursor for Python development with extensions, tools, and configuration instructions.
+- [Background Agents API Overview](https://cursor.com/docs/background-agent/api/overview): Programmatically create and manage AI-powered coding agents working autonomously on repositories.
+- [Agent Terminal Execution](https://cursor.com/docs/agent/terminal): Configure how Agent runs shell commands with sandbox execution, security controls, and allowlist management.
+- [Shell Mode CLI Guide](https://cursor.com/docs/cli/shell-mode): Execute shell commands directly from CLI with safety checks and output display in conversation.
+- [Terminal Inline Edit](https://cursor.com/docs/inline-edit/terminal): Use Cmd+K in Cursor terminal to generate commands with AI assistance automatically.
+- [CLI MCP Server Integration](https://cursor.com/docs/cli/mcp): Configure and manage Model Context Protocol servers with Cursor CLI commands.
+- [Team Analytics Tracking](https://cursor.com/docs/account/teams/analytics): Track team metrics including usage, active users, and AI code contribution analytics.
+- [Cursor Documentation Sitemap](https://cursor.com/docs/sitemap.xml): Complete sitemap of Cursor documentation pages covering features, configuration, and account management.
+- [Cursor Quickstart Guide](https://cursor.com/docs/get-started/quickstart): Learn Cursor's core features including Tab autocomplete, Inline Edit, and Agent functionality.
+- [Teams Admin API Documentation](https://cursor.com/docs/account/teams/admin-api): Programmatically access team data including members, usage metrics, and spending details.
+- [Compact Chat Interface Mode](https://cursor.com/docs/agent/chat/compact): Streamlined chat interface reducing visual clutter by hiding icons and auto-collapsing elements.
+- [Common Issues Troubleshooting](https://cursor.com/docs/troubleshooting/common-issues): Solutions for networking, resource, AI model issues and general FAQs.
+- [Regional Model Availability](https://cursor.com/docs/account/regions): Understand location-based model restrictions and request refunds for affected accounts.
+- [Agent Hooks Configuration Guide](https://cursor.com/docs/agent/hooks): Observe, control, and extend agent loop behavior using custom hook scripts and JSON configuration.
+- [Web and Mobile Agents](https://cursor.com/docs/background-agent/web-and-mobile): Access powerful coding agents on any device through web and mobile, with team collaboration and Slack integration capabilities.
+- [Cursor Core Concepts Guide](https://cursor.com/docs/get-started/concepts): Learn fundamental Cursor features including Tab, Agent, Inline Edit, Chat, Rules, and codebase indexing.
+- [Background Agents Overview](https://cursor.com/docs/background-agent): Spawn asynchronous agents that edit and run code in remote isolated environments autonomously.
+- [Headless CLI Usage Guide](https://cursor.com/docs/cli/headless): Run Cursor CLI in scripts and automation workflows for code analysis, generation, and refactoring tasks.
+- [Cursor Troubleshooting Guide](https://cursor.com/docs/troubleshooting/troubleshooting-guide): Resolve Cursor issues with network diagnostics, extension management, app data clearing, and reinstallation steps.
+- [GitHub Integration Setup](https://cursor.com/docs/integrations/github): Connect Cursor GitHub app for background agents and Bugbot repository access integration.
+- [API Keys Configuration](https://cursor.com/docs/settings/api-keys): Configure your own API keys to send unlimited AI messages at your own cost.
+- [Model Context Protocol Integration](https://cursor.com/docs/context/mcp): Connect Cursor to external tools and data sources using MCP servers.
+- [CLI Slash Commands Reference](https://cursor.com/docs/cli/reference/slash-commands): Complete reference guide for all available slash commands in Cursor CLI tool.
+- [Enterprise Model Integration Management](https://cursor.com/docs/enterprise/model-and-integration-management): Control AI models, manage MCP servers, configure integrations with Slack, GitHub, and Linear for enterprise teams.
+- [MCP Install Links](https://cursor.com/docs/context/mcp/install-links): Create and use deeplinks to install Model Context Protocol servers in Cursor
+- [Cursor Theme Configuration](https://cursor.com/docs/configuration/themes): Configure light and dark themes for Cursor using VS Code themes and custom options.
+- [Legacy Request-Based Pricing](https://cursor.com/docs/account/pricing/request-based-legacy): Documentation of Cursor's outdated request-based pricing model before migration to usage-based pricing.
+- [Teams Pricing Plans](https://cursor.com/docs/account/teams/pricing): Understand Cursor team pricing structure, usage-based billing, included monthly usage, and on-demand rates.
+- [Codebase Indexing Guide](https://cursor.com/docs/context/codebase-indexing): Learn how semantic search indexes your codebase for natural language queries and code discovery.

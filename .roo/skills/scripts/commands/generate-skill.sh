@@ -14,6 +14,7 @@
 #   SKILL_NAME    Skill identifier in kebab-case (optional, auto-generated from URL)
 #
 # Options:
+#   --skill-type TYPE  Type of skill: coding-agent (default) or domain-knowledge
 #   --max-urls N       Maximum number of URLs to process (default: 20)
 #   --use-feynman      Enable Feynman technique for documentation (default: true)
 #   --output-dir DIR   Output directory (default: SKILL_NAME)
@@ -43,6 +44,7 @@ ORCHESTRATOR_MODULE="agent-skill-generator.orchestrator"
 PYTHON_PATH="${PROJECT_ROOT}/.roo/skills/scripts"
 
 # Default values
+DEFAULT_SKILL_TYPE="coding-agent"
 DEFAULT_MAX_URLS=20
 DEFAULT_USE_FEYNMAN=true
 
@@ -93,6 +95,7 @@ ${BOLD}ARGUMENTS:${RESET}
     SKILL_NAME    Skill identifier in kebab-case (optional, auto-generated from URL)
 
 ${BOLD}OPTIONS:${RESET}
+    --skill-type TYPE  Type of skill: coding-agent (default) or domain-knowledge
     --max-urls N       Maximum number of URLs to process (default: ${DEFAULT_MAX_URLS})
     --use-feynman      Enable Feynman technique for documentation (default: ${DEFAULT_USE_FEYNMAN})
     --output-dir DIR   Output directory (default: SKILL_NAME)
@@ -281,6 +284,7 @@ parse_arguments() {
     fi
     
     # Parse optional arguments
+    SKILL_TYPE="${DEFAULT_SKILL_TYPE}"
     MAX_URLS="${DEFAULT_MAX_URLS}"
     USE_FEYNMAN="${DEFAULT_USE_FEYNMAN}"
     OUTPUT_DIR=""
@@ -288,6 +292,10 @@ parse_arguments() {
     
     while [[ $# -gt 0 ]]; do
         case "$1" in
+            --skill-type)
+                SKILL_TYPE="$2"
+                shift 2
+                ;;
             --max-urls)
                 MAX_URLS="$2"
                 shift 2
@@ -338,6 +346,7 @@ main() {
     print_header "Configuration"
     echo -e "${BOLD}URL:${RESET}           ${URL}"
     echo -e "${BOLD}Skill Name:${RESET}    ${SKILL_NAME}"
+    echo -e "${BOLD}Skill Type:${RESET}    ${SKILL_TYPE}"
     echo -e "${BOLD}Max URLs:${RESET}      ${MAX_URLS}"
     echo -e "${BOLD}Use Feynman:${RESET}   ${USE_FEYNMAN}"
     if [[ -n "${OUTPUT_DIR}" ]]; then
@@ -353,6 +362,7 @@ main() {
         generate
         "$URL"
         "$SKILL_NAME"
+        --skill-type "$SKILL_TYPE"
         --max-urls "$MAX_URLS"
     )
     

@@ -55,6 +55,7 @@
     "!.roo/skills/scripts/**/__pycache__",
     "!.roo/skills/scripts/**/*.pyc",
     "!.roo/skills/scripts/**/venv",
+    "coding-agent-docs/",
     ".roomodes",
     ".env.example",
     "agent_skills_spec.md",

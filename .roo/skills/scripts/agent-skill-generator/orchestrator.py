@@ -51,18 +51,20 @@ class SkillOrchestrator:
         skill_name: str,
         max_pages: int = 50,
         output_dir: Optional[Path] = None,
-        groups: list[str] = None
+        groups: list[str] = None,
+        skill_type: str = "coding-agent"
     ) -> SkillGenerationResult:
         """
         Orchestrate complete skill generation.
-        
+
         Args:
             url: Documentation URL to process
             skill_name: Skill identifier (kebab-case)
             max_pages: Maximum pages to scrape
             output_dir: Output directory for skill files
             groups: Permission groups for mode
-            
+            skill_type: Type of skill - "coding-agent" or "domain-knowledge"
+
         Returns:
             SkillGenerationResult with paths and validation status
         """
@@ -84,17 +86,19 @@ class SkillOrchestrator:
             console.print("[bold]Phase 2:[/bold] Researching ecosystem and best practices...")
             wisdom_document = self.ecosystem_researcher.research_ecosystem(
                 skill_name,
-                knowledge_bundle.llms_txt[:2000]  # Provide context
+                knowledge_bundle.llms_txt[:2000],  # Provide context
+                skill_type=skill_type
             )
             console.print("✓ Research complete\n")
-            
+
             # Phase 3: Skill Synthesis
             console.print("[bold]Phase 3:[/bold] Creating SKILL.md and references...")
             skill_bundle = self.skill_creator.create_skill(
                 skill_name,
                 knowledge_bundle,
                 wisdom_document,
-                compatible_modes=groups
+                compatible_modes=groups,
+                skill_type=skill_type
             )
             console.print("✓ Skill synthesized\n")
             
@@ -183,6 +187,12 @@ def generate(
         "-o",
         help="Output directory (default: skill-name)"
     ),
+    skill_type: str = typer.Option(
+        "coding-agent",
+        "--skill-type",
+        "-t",
+        help="Type of skill: coding-agent or domain-knowledge"
+    ),
     max_urls: int = typer.Option(
         20,
         "--max-urls",
@@ -197,26 +207,41 @@ def generate(
     )
 ):
     """
-    Generate an Agent Skill from documentation URL.
-    
-    Example:
+    Generate a Skill from documentation URL.
+
+    Examples:
+        # Generate coding agent skill
         python -m scripts.agent-skill-generator.orchestrator generate \\
-            "https://fastapi.tiangolo.com" \\
-            "fastapi-developer" \\
+            "https://cursor.com" \\
+            "cursor-agent" \\
+            --skill-type coding-agent \\
             --max-urls 50
+
+        # Generate domain knowledge skill
+        python -m scripts.agent-skill-generator.orchestrator generate \\
+            "https://langchain-ai.github.io/langgraph/" \\
+            "langgraph-expert" \\
+            --skill-type domain-knowledge \\
+            --max-urls 30
     """
     # Set logging level
     if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    
+
+    # Validate skill type
+    if skill_type not in ["coding-agent", "domain-knowledge"]:
+        console.print(f"[red]Error: Invalid skill type '{skill_type}'. Must be 'coding-agent' or 'domain-knowledge'[/red]")
+        sys.exit(1)
+
     # Create orchestrator and generate skill
     orchestrator = SkillOrchestrator()
-    
+
     result = orchestrator.generate_skill(
         url=url,
         skill_name=skill_name,
         max_pages=max_urls,
-        output_dir=output_dir
+        output_dir=output_dir,
+        skill_type=skill_type
     )
     
     # Display results

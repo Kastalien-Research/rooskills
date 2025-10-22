@@ -1,5 +1,5 @@
 ---
-description: Generate Agent Skills from web documentation with automated knowledge extraction and ecosystem research
+description: Generate Skills from web documentation - supports both coding agents and domain knowledge with automated extraction and research
 ---
 **Execution Mode**: Auto-Coder
 
@@ -12,18 +12,19 @@ When this command is invoked, you must:
 
 # /generate-skill
 
-Automatically create integrated Roo Code skills from web documentation using AI-powered extraction, research, and synthesis.
+Automatically create integrated Roo Code skills from web documentation using AI-powered extraction, research, and synthesis. Supports both coding agents and domain knowledge skills.
 
 ## Usage
 
 ```
-/generate-skill $URL1 [$URL2 $URL3 ...] [--max-urls $MAX_URLS] [--use-feynman $USE_FEYNMAN] [--parallel $N]
+/generate-skill $URL1 [$URL2 $URL3 ...] [--skill-type $TYPE] [--max-urls $MAX_URLS] [--use-feynman $USE_FEYNMAN] [--parallel $N]
 ```
 
 ### Arguments
 
 - **`$URL1, $URL2, ...`** (required) - One or more documentation URLs to process
 - **`$SKILL_NAME`** (optional) - Skill identifier in kebab-case (auto-generated from URL if not provided)
+- **`--skill-type $TYPE`** (optional) - Type of skill: `coding-agent` (default) or `domain-knowledge`
 - **`$MAX_URLS`** (optional) - Maximum URLs to scrape per product (default: `20`)
 - **`$USE_FEYNMAN`** (optional) - Use Sequential Feynman for deep understanding (default: `true`)
 - **`--parallel $N`** (optional) - Maximum concurrent subagents (default: `3`)
@@ -31,23 +32,26 @@ Automatically create integrated Roo Code skills from web documentation using AI-
 ### Quick Examples
 
 ```bash
-# Basic usage - generate skill from single URL
+# Basic usage - generate coding agent skill from single URL
 /generate-skill https://fastapi.tiangolo.com
 
-# Multiple URLs with parallel processing (one subagent per URL)
-/generate-skill https://cursor.com https://windsurf.com https://cline.bot
+# Generate domain knowledge skills from multiple URLs
+/generate-skill https://langchain-ai.github.io/langgraph/ https://effect.website/ https://modelcontextprotocol.io/ --skill-type domain-knowledge
+
+# Multiple coding agent URLs with parallel processing
+/generate-skill https://cursor.com https://windsurf.com https://cline.bot --skill-type coding-agent
 
 # Control parallelism
 /generate-skill https://cursor.com https://windsurf.com --parallel 5
 
 # Custom skill name (single URL only)
-/generate-skill https://supabase.com supabase-expert
+/generate-skill https://supabase.com supabase-expert --skill-type domain-knowledge
 
 # Limit URLs and skip deep analysis
 /generate-skill https://stripe.com/docs stripe-integration --max-urls 30 --use-feynman false
 
-# Deep dive with Sequential Feynman
-/generate-skill https://langchain.readthedocs.io langchain-agent --max-urls 50 --use-feynman true
+# Deep dive with Sequential Feynman for domain knowledge
+/generate-skill https://langchain.readthedocs.io langchain-expert --skill-type domain-knowledge --max-urls 50 --use-feynman true
 
 # Batch process coding agents with viability checks
 /generate-skill \
@@ -55,6 +59,7 @@ Automatically create integrated Roo Code skills from web documentation using AI-
   https://windsurf.com \
   https://cline.bot \
   https://aider.chat \
+  --skill-type coding-agent \
   --parallel 4 \
   --max-urls 20
 ```
