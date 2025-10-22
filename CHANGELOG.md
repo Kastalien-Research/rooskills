@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2025-10-22
+
+### Fixed
+- Republish to ensure README displays correctly on npm registry
+- No functional changes from v1.2.0
+
 ## [1.2.0] - 2025-10-22
 
 ### Added
@@ -81,10 +87,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.2.1** - Fix npm README display (republish)
 - **1.2.0** - Sequential Feynman Batch Executor + Enhanced skill generation
 - **1.1.4** - CI/CD and security improvements
 - **1.1.3** - Initial npm package release
 
+[1.2.1]: https://github.com/Kastalien-Research/rooskills/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Kastalien-Research/rooskills/compare/v1.1.4...v1.2.0
 [1.1.4]: https://github.com/Kastalien-Research/rooskills/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/Kastalien-Research/rooskills/releases/tag/v1.1.3
