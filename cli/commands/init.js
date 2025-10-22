@@ -116,7 +116,7 @@ async function initCommand(options) {
     console.log(chalk.green.bold('\n✨ Roo Skills initialized successfully!\n'));
     console.log(chalk.cyan('Next steps:'));
     console.log('  1. Copy .env.example to .env and add your API keys');
-    console.log('  2. Import .roomodes into your Roo Code settings');
+    console.log('  2. Restart Roo Code to auto-detect .roomodes configuration');
     console.log('  3. Use slash commands from .roo/commands/ in Roo Code');
     console.log('  4. Start using skills in your Roo Code workspace\n');
     console.log(chalk.gray('Generate a new skill:'));

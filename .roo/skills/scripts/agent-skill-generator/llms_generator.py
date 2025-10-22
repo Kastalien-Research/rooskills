@@ -1,16 +1,17 @@
 """
 LLMS Generator Module - Documentation scraping and summarization.
-Uses Firecrawl API for scraping and OpenAI for generating summaries.
+Uses Firecrawl API for scraping and Anthropic Claude for generating summaries.
 """
 
 import re
 import time
 import logging
+import json
 from typing import List, Dict, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
-from openai import OpenAI
+from anthropic import Anthropic
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .config import Settings
@@ -23,14 +24,14 @@ class LLMSGenerator:
     """
     Handles documentation scraping and summarization.
     
-    Uses Firecrawl to map and scrape websites, then OpenAI to generate
+    Uses Firecrawl to map and scrape websites, then Anthropic Claude to generate
     concise titles and descriptions for each page.
     """
     
     def __init__(self, settings: Settings):
         """Initialize with settings containing API keys."""
         self.settings = settings
-        self.openai_client = OpenAI(api_key=settings.openai_api_key)
+        self.anthropic_client = Anthropic(api_key=settings.anthropic_api_key)
         self.headers = {
             "Authorization": f"Bearer {settings.firecrawl_api_key}",
             "Content-Type": "application/json"
@@ -121,7 +122,7 @@ class LLMSGenerator:
     )
     def _generate_summary(self, url: str, markdown: str) -> Tuple[str, str]:
         """
-        Generate title and description using OpenAI.
+        Generate title and description using Anthropic Claude.
         
         Args:
             url: Page URL
@@ -138,27 +139,39 @@ Return the response in JSON format:
 {{
     "title": "3-4 word title",
     "description": "9-10 word description"
-}}"""
+}}
+
+Page content:
+{markdown[:8000]}"""
         
-        response = self.openai_client.chat.completions.create(
-            model=self.settings.openai_model,
+        response = self.anthropic_client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=200,
+            temperature=0.3,
             messages=[
                 {
-                    "role": "system",
-                    "content": "You are a helpful assistant that generates concise titles and descriptions for web pages."
-                },
-                {
                     "role": "user",
-                    "content": f"{prompt}\n\nPage content:\n{markdown[:4000]}"
+                    "content": prompt
                 }
-            ],
-            response_format={"type": "json_object"},
-            temperature=self.settings.openai_temperature,
-            max_tokens=100
+            ]
         )
         
-        import json
-        result = json.loads(response.choices[0].message.content)
+        # Extract JSON from response
+        content = response.content[0].text
+        # Try to find JSON in the response
+        try:
+            # Look for JSON object in the response
+            start = content.find('{')
+            end = content.rfind('}') + 1
+            if start != -1 and end > start:
+                json_str = content[start:end]
+                result = json.loads(json_str)
+            else:
+                result = json.loads(content)
+        except json.JSONDecodeError:
+            logger.warning(f"Failed to parse JSON from Claude response for {url}")
+            result = {"title": "Page", "description": "No description available"}
+        
         return (
             result.get("title", "Page"),
             result.get("description", "No description available")

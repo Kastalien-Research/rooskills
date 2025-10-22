@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     
     # Required API Keys
     firecrawl_api_key: str
-    openai_api_key: str
     anthropic_api_key: str
     
     # Optional Exa API Key (for Exa MCP server)
@@ -39,17 +38,13 @@ class Settings(BaseSettings):
     
     # Rate limiting (requests per minute)
     firecrawl_rate_limit: int = 10
-    openai_rate_limit: int = 60
+    anthropic_rate_limit: int = 60
     
     # Validation rules
     max_skill_lines: int = 500
     
     # Firecrawl configuration
     firecrawl_base_url: str = "https://api.firecrawl.dev/v1"
-    
-    # OpenAI configuration
-    openai_model: str = "gpt-4o-mini"
-    openai_temperature: float = 0.3
     
     # MCP configuration
     exa_mcp_command: str = "npx"
@@ -68,8 +63,6 @@ class Settings(BaseSettings):
         
         if not self.firecrawl_api_key:
             missing_keys.append("FIRECRAWL_API_KEY")
-        if not self.openai_api_key:
-            missing_keys.append("OPENAI_API_KEY")
         if not self.anthropic_api_key:
             missing_keys.append("ANTHROPIC_API_KEY")
         
