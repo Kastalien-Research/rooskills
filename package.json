@@ -1,0 +1,49 @@
+{
+  "name": "@kastalien-research/rooskills",
+  "version": "1.0.0",
+  "description": "Bring Anthropic's Agent Skills to Roo Code - CLI tool for setting up skills in your project",
+  "main": "cli/index.js",
+  "bin": {
+    "rooskills": "./cli/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "roo-code",
+    "claude",
+    "anthropic",
+    "agent-skills",
+    "ai",
+    "cli",
+    "automation"
+  ],
+  "author": "Kastalien Research",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kastalien-Research/rooskills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Kastalien-Research/rooskills/issues"
+  },
+  "homepage": "https://github.com/Kastalien-Research/rooskills#readme",
+  "files": [
+    "cli/",
+    ".roo/",
+    ".roomodes",
+    ".env.example",
+    "agent_skills_spec.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^8.2.6",
+    "ora": "^5.4.1"
+  }
+}

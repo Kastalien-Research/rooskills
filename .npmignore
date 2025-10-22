@@ -1,0 +1,32 @@
+# Development files
+.env
+*.log
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Test files
+test/
+*.test.js
+
+# Documentation (except what's needed)
+coding-agent-docs/
+
+# Build artifacts
+node_modules/
+*.pyc
+__pycache__/
+
+# Keep these for the package
+!.roo/
+!.roomodes
+!.env.example
+!cli/
+!README.md
+!agent_skills_spec.md
