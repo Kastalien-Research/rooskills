@@ -1,33 +1,59 @@
-# Roo Code Skills Template
+# Roo Skills
 
 **Bring Anthropic's Agent Skills to Roo Code**
 
-This repository is a template that enables Roo Code users to leverage [Anthropic's Agent Skills system](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) - the same powerful capability available in Claude Code. It provides:
+An NPM package and template that enables Roo Code users to leverage [Anthropic's Agent Skills system](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) - the same powerful capability available in Claude Code.
 
-- **Skills Integration** - Use Anthropic's Agent Skills format in Roo Code through custom modes
-- **Automated Generation** - Create new skills from any documentation URL
-- **Pre-built Skills** - Ready-to-use skills for development, AI automation, and documentation
+[![npm version](https://badge.fury.io/js/@kastalien-research%2Frooskills.svg)](https://www.npmjs.com/package/@kastalien-research/rooskills)
+[![npm downloads](https://img.shields.io/npm/dm/@kastalien-research/rooskills.svg)](https://www.npmjs.com/package/@kastalien-research/rooskills)
+
+## Features
+
+- **🚀 One-Command Setup** - Install skills in any project with `npx @kastalien-research/rooskills init`
+- **🤖 Automated Generation** - Create new skills from any documentation URL
+- **📚 Pre-built Skills** - Ready-to-use skills for development, AI automation, and documentation
+- **🔧 CLI Tools** - Simple commands for initialization and skill generation
+
+## Quick Start
+
+### Installation (Recommended)
+
+Install skills in your Roo Code project with a single command:
+
+```bash
+npx @kastalien-research/rooskills init
+```
+
+This will:
+- Copy all pre-built skills to `.roo/skills/`
+- Add `.roomodes` configuration for Roo Code
+- Create `.env.example` with required API keys
+- Optionally install Python dependencies
+
+### Generate a New Skill
+
+Create a custom skill from any documentation URL:
+
+```bash
+npx @kastalien-research/rooskills generate https://docs.example.com skill-name --max-urls 20
+```
+
+### List Available Skills
+
+```bash
+npx @kastalien-research/rooskills list
+```
 
 ## What are Agent Skills?
 
-Agent Skills are modular instruction sets that enhance Claude's capabilities for specific tasks. Originally developed for Claude Code, this template brings that same functionality to Roo Code by:
+Agent Skills are modular instruction sets that enhance Claude's capabilities for specific tasks. Originally developed for Claude Code, this package brings that same functionality to Roo Code by:
 
 1. Converting Agent Skills into Roo Code custom modes via [`.roomodes`](.roomodes)
 2. Organizing skills in [`.roo/skills/`](.roo/skills/) for clean project structure
 3. Providing automated tools to generate new skills from documentation
 
-This means Roo Code users get the same skill-based enhancements that Claude Code users enjoy.
+## Pre-built Skills
 
-## Features
-
-### 🤖 Automated Skill Generator
-The repository includes a powerful skill generation system that can automatically create comprehensive skills from documentation URLs using:
-- **Firecrawl** for web scraping and content extraction
-- **OpenAI GPT-4o-mini** for knowledge summarization
-- **Claude Agent SDK (Anthropic)** for ecosystem research and best practices
-- **Exa MCP** for supplementary research
-
-### 📚 Pre-built Skills
 All skills are located in [`.roo/skills/`](.roo/skills/) and registered as custom modes in [`.roomodes`](.roomodes):
 
 #### Development & Technical
@@ -46,27 +72,12 @@ All skills are located in [`.roo/skills/`](.roo/skills/) and registered as custo
 #### Documentation
 - **architecture** - Architecture documentation for the skill generation system
 
-## Using This Template
+## Advanced Usage
 
-### For Roo Code Users
+### Environment Variables
 
-1. **Fork or Clone** this repository to your Roo Code workspace
-2. **Copy `.env.example`** (if provided) to `.env` and add your API keys
-3. **Import the `.roomodes` configuration** into your Roo Code settings
-4. Skills in [`.roo/skills/`](.roo/skills/) will be available as custom modes
+After initialization, create a `.env` file in your project root:
 
-### For Claude Code Users
-
-While this template is designed for Roo Code, the skills themselves are compatible with Claude Code's native Agent Skills system:
-
-1. Skills can be used directly from [Anthropic's official skills repository](https://github.com/anthropics/skills)
-2. Or you can copy individual skills from this template's `.roo/skills/` directory
-
-## Quick Start
-
-### Prerequisites
-
-1. **Environment Variables** - Create a `.env` file in the project root:
 ```bash
 # Firecrawl API Key (get from https://firecrawl.dev)
 FIRECRAWL_API_KEY=your_key_here
@@ -81,37 +92,7 @@ ANTHROPIC_API_KEY=your_key_here
 EXA_API_KEY=your_key_here
 ```
 
-2. **Python Dependencies** - Install required packages:
-```bash
-pip install -r .roo/skills/scripts/agent-skill-generator/requirements.txt
-```
-
-### Generating a New Skill
-
-Use the skill generator to create a new skill from any documentation URL:
-
-```bash
-./.roo/skills/scripts/commands/generate-skill.sh "https://docs.example.com/" "skill-name" --max-urls 15
-```
-
-**Parameters:**
-- `URL` - Documentation URL to process (required)
-- `SKILL_NAME` - Skill identifier in kebab-case (optional, auto-generated from URL)
-- `--max-urls N` - Maximum number of URLs to process (default: 20)
-- `--output-dir DIR` - Output directory (default: .roo/skills/SKILL_NAME)
-- `--verbose` - Enable verbose logging
-- `--help` - Show help message
-
-**Example:**
-```bash
-# Generate a FastAPI skill
-./.roo/skills/scripts/commands/generate-skill.sh "https://fastapi.tiangolo.com" "fastapi-expert" --max-urls 30
-
-# Generate with auto-detected name
-./.roo/skills/scripts/commands/generate-skill.sh "https://docs.stripe.com/"
-```
-
-### Generation Process
+### Skill Generation Process
 
 The skill generator runs through 5 automated phases:
 
@@ -121,7 +102,7 @@ The skill generator runs through 5 automated phases:
 4. **File Writing** - Creates all skill files and reference documentation
 5. **Mode Registration** - Registers the skill as a mode in `.roomodes`
 
-### Output Structure
+### Generated Skill Structure
 
 Each generated skill includes:
 ```
@@ -133,19 +114,69 @@ Each generated skill includes:
     └── documentation_index.md        # Curated index of key resources
 ```
 
+### Manual Installation (Alternative)
+
+If you prefer not to use the NPM package:
+
+1. **Fork or Clone** this repository to your Roo Code workspace
+2. **Copy `.env.example`** to `.env` and add your API keys
+3. **Import the `.roomodes` configuration** into your Roo Code settings
+4. Skills in [`.roo/skills/`](.roo/skills/) will be available as custom modes
+
+### For Claude Code Users
+
+While this package is designed for Roo Code, the skills themselves are compatible with Claude Code's native Agent Skills system:
+
+1. Skills can be used directly from [Anthropic's official skills repository](https://github.com/anthropics/skills)
+2. Or you can copy individual skills from this template's `.roo/skills/` directory
+
 ## Using Skills in Roo Code
 
-### Roo Code Plugin Marketplace
-Register this repository as a plugin marketplace:
-```bash
-/plugin marketplace add username/rooskills
-```
-
-### Manual Skill Usage
 Skills are automatically loaded from `.roomodes` and can be activated by:
 1. Mentioning the skill name in your conversation
 2. Switching to the skill's mode using the mode selector
 3. Referencing skills in task delegation
+
+## CLI Reference
+
+### `rooskills init`
+
+Initialize Roo Skills in your project.
+
+**Options:**
+- `-d, --dir <directory>` - Target directory (default: current directory)
+- `--no-install` - Skip Python dependency installation
+- `--skills <skills...>` - Install specific skills only
+
+**Examples:**
+```bash
+rooskills init
+rooskills init -d ./my-project
+rooskills init --no-install
+```
+
+### `rooskills generate <url> [skill-name]`
+
+Generate a new skill from documentation URL.
+
+**Arguments:**
+- `url` - Documentation URL to process (required)
+- `skill-name` - Skill identifier in kebab-case (optional)
+
+**Options:**
+- `--max-urls <number>` - Maximum URLs to process (default: 20)
+- `--output-dir <directory>` - Custom output directory
+- `--verbose` - Enable verbose logging
+
+**Examples:**
+```bash
+rooskills generate https://fastapi.tiangolo.com
+rooskills generate https://docs.stripe.com stripe-expert --max-urls 30
+```
+
+### `rooskills list`
+
+List all available pre-built skills.
 
 ## Validation
 
