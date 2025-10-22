@@ -45,7 +45,9 @@ class ThoughtboxClient:
         self,
         base_url: str = "https://server.smithery.ai/@Kastalien-Research/clear-thought-two/mcp",
         api_key: str = "fe556de3-a658-4330-a3e7-563cf6a91972",
-        profile: str = "operational-bedbug-smw1eB"
+        profile: str = "operational-bedbug-smw1eB",
+        timeout: float = 30.0,
+        connect_timeout: float = 10.0
     ):
         """
         Initialize Thoughtbox client.
@@ -54,12 +56,16 @@ class ThoughtboxClient:
             base_url: Base URL for Thoughtbox MCP server
             api_key: API key for authentication
             profile: Profile identifier
+            timeout: Request timeout in seconds (default: 30.0)
+            connect_timeout: Connection timeout in seconds (default: 10.0)
         """
         if not MCP_AVAILABLE:
             raise RuntimeError("MCP client not available. Install with: pip install mcp[cli]")
 
         params = {"api_key": api_key, "profile": profile}
         self.url = f"{base_url}?{urlencode(params)}"
+        self.timeout = timeout
+        self.connect_timeout = connect_timeout
 
     async def reason(self, prompt: str) -> str:
         """
@@ -70,33 +76,56 @@ class ThoughtboxClient:
 
         Returns:
             Thoughtbox's reasoning response
+            
+        Raises:
+            asyncio.TimeoutError: If request times out
+            RuntimeError: If no tools are available or connection fails
         """
-        async with streamablehttp_client(self.url) as (read, write, _):
-            async with ClientSession(read, write) as session:
-                # Initialize connection
-                await session.initialize()
-
-                # List available tools
-                tools_result = await session.list_tools()
-                available_tools = [t.name for t in tools_result.tools]
-
-                # Use clear_thought tool if available
-                if "clear_thought" in available_tools:
-                    result = await session.call_tool(
-                        "clear_thought",
-                        arguments={"thought": prompt}
-                    )
-                    return result.content[0].text
-                else:
-                    # Fallback: use first available tool
-                    if available_tools:
-                        result = await session.call_tool(
-                            available_tools[0],
-                            arguments={"prompt": prompt}
+        try:
+            # Apply timeout to entire operation
+            async with asyncio.timeout(self.timeout):
+                async with streamablehttp_client(self.url) as (read, write, _):
+                    async with ClientSession(read, write) as session:
+                        # Initialize connection with timeout
+                        await asyncio.wait_for(
+                            session.initialize(),
+                            timeout=self.connect_timeout
                         )
-                        return result.content[0].text
-                    else:
-                        raise RuntimeError("No tools available in Thoughtbox MCP")
+
+                        # List available tools
+                        tools_result = await asyncio.wait_for(
+                            session.list_tools(),
+                            timeout=self.connect_timeout
+                        )
+                        available_tools = [t.name for t in tools_result.tools]
+
+                        # Use clear_thought tool if available
+                        if "clear_thought" in available_tools:
+                            result = await asyncio.wait_for(
+                                session.call_tool(
+                                    "clear_thought",
+                                    arguments={"thought": prompt}
+                                ),
+                                timeout=self.timeout
+                            )
+                            return result.content[0].text
+                        else:
+                            # Fallback: use first available tool
+                            if available_tools:
+                                result = await asyncio.wait_for(
+                                    session.call_tool(
+                                        available_tools[0],
+                                        arguments={"prompt": prompt}
+                                    ),
+                                    timeout=self.timeout
+                                )
+                                return result.content[0].text
+                            else:
+                                raise RuntimeError("No tools available in Thoughtbox MCP")
+        except asyncio.TimeoutError:
+            raise asyncio.TimeoutError(
+                f"Request timed out after {self.timeout} seconds"
+            )
 
     async def analyze_command(self, command_content: str, command_name: str) -> Intent:
         """
@@ -109,13 +138,14 @@ class ThoughtboxClient:
         Returns:
             Intent with deep understanding of the command
         """
+        # Note: Content truncated to 2000 chars for context window
         prompt = f"""
 Analyze this slash command and deeply understand its intent:
 
 Command: /{command_name}
 
 Content:
-{command_content[:2000]}  # Truncate for context window
+{command_content[:2000]}
 
 Your task:
 1. What is the core PURPOSE of this command?
@@ -192,13 +222,14 @@ Be concise but thorough. Focus on enabling skill generation.
         Returns:
             Intent with deep understanding of the skill
         """
+        # Note: Content truncated to 2000 chars for context window
         prompt = f"""
 Analyze this Agent Skill and deeply understand its intent:
 
 Skill: {skill_name}
 
 Content:
-{skill_content[:2000]}  # Truncate for context window
+{skill_content[:2000]}
 
 Your task:
 1. What is the core PURPOSE of this skill?
