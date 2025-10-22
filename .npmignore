@@ -30,3 +30,10 @@ __pycache__/
 !cli/
 !README.md
 !agent_skills_spec.md
+
+# MCP config
+.roo/mcp.json
+cc_mcp_config.json
+
+# Specs
+specs/
