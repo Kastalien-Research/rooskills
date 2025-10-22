@@ -50,9 +50,23 @@ license: {metadata.license}
     def _generate_overview_section(
         self,
         skill_name: str,
-        wisdom: WisdomDocument
+        wisdom: WisdomDocument,
+        skill_type: str = "coding-agent"
     ) -> str:
         """Generate the overview section."""
+        if skill_type == "domain-knowledge":
+            when_to_use = f"""Use this skill when:
+- You need to learn or understand {skill_name.replace('-', ' ')}
+- You're working on projects that involve these concepts
+- You need guidance on best practices and patterns
+- You want to apply these techniques effectively"""
+        else:
+            when_to_use = f"""Use this skill when:
+- You need to work with {skill_name.replace('-', ' ')}
+- You're implementing features that involve these use cases
+- You need guidance on integration and automation
+- You want to extend or customize the tool"""
+
         return f"""# {skill_name.replace('-', ' ').title()}
 
 {wisdom.overview}
@@ -65,13 +79,10 @@ This skill provides specialized knowledge and workflows for:
 
 ## When to Use This Skill
 
-Use this skill when:
-- You need to work with {skill_name.replace('-', ' ')}
-- You're implementing features that involve these use cases
-- You need guidance on best practices and patterns
+{when_to_use}
 """
     
-    def _generate_ecosystem_section(self, wisdom: WisdomDocument) -> str:
+    def _generate_ecosystem_section(self, wisdom: WisdomDocument, skill_type: str = "coding-agent") -> str:
         """Generate ecosystem positioning section."""
         position = wisdom.ecosystem_position
         
@@ -90,23 +101,30 @@ Use this skill when:
         
         return section
     
-    def _generate_integration_section(self, wisdom: WisdomDocument) -> str:
+    def _generate_integration_section(self, wisdom: WisdomDocument, skill_type: str = "coding-agent") -> str:
         """Generate integration patterns section."""
         patterns = wisdom.integration_patterns
-        
-        section = "## Integration Patterns\n\n"
-        
-        if patterns.get("common"):
+
+        if skill_type == "domain-knowledge":
+            section = "## Application Patterns\n\n"
+            section += "### Learning and Implementation\n\n"
+        else:
+            section = "## Integration Patterns\n\n"
             section += "### Common Patterns\n\n"
+
+        if patterns.get("common"):
             section += self._format_list(patterns["common"]) + "\n"
-        
+
         if patterns.get("advanced"):
-            section += "### Advanced Patterns\n\n"
+            if skill_type == "domain-knowledge":
+                section += "### Advanced Techniques\n\n"
+            else:
+                section += "### Advanced Patterns\n\n"
             section += self._format_list(patterns["advanced"]) + "\n"
-        
+
         return section
     
-    def _generate_best_practices_section(self, wisdom: WisdomDocument) -> str:
+    def _generate_best_practices_section(self, wisdom: WisdomDocument, skill_type: str = "coding-agent") -> str:
         """Generate best practices section."""
         section = "## Best Practices\n\n"
         
@@ -185,17 +203,19 @@ Use this skill when:
         skill_name: str,
         knowledge: KnowledgeBundle,
         wisdom: WisdomDocument,
-        compatible_modes: Optional[List[str]] = None
+        compatible_modes: Optional[List[str]] = None,
+        skill_type: str = "coding-agent"
     ) -> SkillBundle:
         """
         Generate SKILL.md with YAML frontmatter and content.
-        
+
         Args:
             skill_name: Skill identifier (kebab-case)
             knowledge: Documentation knowledge bundle
             wisdom: Ecosystem research wisdom
             compatible_modes: List of compatible mode slugs
-            
+            skill_type: Type of skill - "coding-agent" or "domain-knowledge"
+
         Returns:
             SkillBundle with skill_md, references, and metadata
         """
@@ -213,10 +233,10 @@ Use this skill when:
         # Generate SKILL.md content
         sections = [
             self._generate_yaml_frontmatter(metadata),
-            self._generate_overview_section(skill_name, wisdom),
-            self._generate_ecosystem_section(wisdom),
-            self._generate_integration_section(wisdom),
-            self._generate_best_practices_section(wisdom),
+            self._generate_overview_section(skill_name, wisdom, skill_type),
+            self._generate_ecosystem_section(wisdom, skill_type),
+            self._generate_integration_section(wisdom, skill_type),
+            self._generate_best_practices_section(wisdom, skill_type),
             self._generate_reference_section(knowledge, wisdom)
         ]
         

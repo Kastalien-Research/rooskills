@@ -33,20 +33,30 @@ class EcosystemResearcher:
         self,
         topic: str,
         knowledge_context: str,
-        phase: str
+        phase: str,
+        skill_type: str = "coding-agent"
     ) -> str:
         """
         Create a research prompt for a specific phase.
-        
+
         Args:
             topic: The tool/framework being researched
             knowledge_context: Context from llms.txt
             phase: Research phase (discovery, ecosystem, practices)
-            
+            skill_type: Type of skill being created
+
         Returns:
             Formatted research prompt
         """
-        base_context = f"""You are researching {topic} to create a comprehensive skill guide.
+        # Customize context based on skill type
+        if skill_type == "domain-knowledge":
+            purpose = f"to create a comprehensive domain knowledge skill for {topic}"
+            focus = "learning, understanding, and applying"
+        else:
+            purpose = f"to create a coding agent skill for {topic}"
+            focus = "integration, automation, and extensibility"
+
+        base_context = f"""You are researching {topic} {purpose}.
 
 Available documentation context:
 {knowledge_context[:2000]}...
@@ -54,36 +64,70 @@ Available documentation context:
 """
         
         if phase == "discovery":
-            return base_context + f"""Phase 1: Discovery
+            if skill_type == "domain-knowledge":
+                return base_context + f"""Phase 1: Discovery
+Use Exa MCP to search and answer:
+1. What is {topic}? (2-3 paragraph overview)
+2. Who are the primary users and learners?
+3. What concepts and problems does it address?
+4. Key features, principles, and capabilities
+5. Learning curve and prerequisites
+
+Focus on understanding and knowledge acquisition."""
+            else:
+                return base_context + f"""Phase 1: Discovery
 Use Exa MCP to search and answer:
 1. What is {topic}? (2-3 paragraph overview)
 2. Who are the primary users?
 3. What problems does it solve?
 4. Key features and capabilities
+5. Extensibility and automation potential
 
-Provide a comprehensive yet concise summary."""
-        
+Focus on integration and automation capabilities."""
+
         elif phase == "ecosystem":
-            return base_context + f"""Phase 2: Ecosystem Mapping
+            if skill_type == "domain-knowledge":
+                return base_context + f"""Phase 2: Ecosystem Mapping
+Use Exa MCP to search and identify:
+1. What category/domain does {topic} belong to?
+2. What are the main alternatives and related technologies?
+3. What tools/frameworks does it work with?
+4. Common learning paths and use cases
+5. When should you learn {topic} vs alternatives?
+
+Focus on educational positioning and knowledge building."""
+            else:
+                return base_context + f"""Phase 2: Ecosystem Mapping
 Use Exa MCP to search and identify:
 1. What category/domain does {topic} belong to?
 2. What are the main alternatives?
 3. What tools/services does it integrate with?
-4. Common use cases and scenarios
+4. Common automation and integration scenarios
 5. When should you use {topic} vs alternatives?
 
-Focus on practical positioning and real-world usage."""
-        
+Focus on practical positioning and integration opportunities."""
+
         elif phase == "practices":
-            return base_context + f"""Phase 3: Best Practices & Pitfalls
+            if skill_type == "domain-knowledge":
+                return base_context + f"""Phase 3: Best Practices & Learning
 Use Exa MCP to search and identify:
-1. Recommended patterns and best practices
+1. Recommended learning patterns and approaches
+2. Common misconceptions and learning pitfalls
+3. Key concepts to master first
+4. Practical application strategies
+5. Advanced techniques and patterns
+
+Focus on effective learning and application."""
+            else:
+                return base_context + f"""Phase 3: Best Practices & Pitfalls
+Use Exa MCP to search and identify:
+1. Recommended integration patterns and best practices
 2. Common mistakes and anti-patterns
 3. Security considerations
 4. Performance optimization tips
 5. Testing and debugging approaches
 
-Provide actionable, practical guidance."""
+Focus on practical implementation guidance."""
         
         return base_context
     
@@ -91,7 +135,8 @@ Provide actionable, practical guidance."""
         self,
         topic: str,
         knowledge_context: str,
-        phase: str
+        phase: str,
+        skill_type: str = "coding-agent"
     ) -> ResearchPhaseResult:
         """
         Execute a single research phase using Claude + Exa.
@@ -112,7 +157,7 @@ Provide actionable, practical guidance."""
         """
         logger.info(f"Executing research phase: {phase}")
         
-        prompt = self._create_research_prompt(topic, knowledge_context, phase)
+        prompt = self._create_research_prompt(topic, knowledge_context, phase, skill_type)
         
         # Note: This is a simplified version without actual MCP integration
         # In production, you would use the Exa MCP server here
@@ -138,15 +183,17 @@ Provide actionable, practical guidance."""
     def research_ecosystem(
         self,
         topic: str,
-        knowledge_context: str
+        knowledge_context: str,
+        skill_type: str = "coding-agent"
     ) -> WisdomDocument:
         """
         Execute sequential Feynman research process.
-        
+
         Args:
             topic: The tool/framework to research
             knowledge_context: Context from llms.txt
-            
+            skill_type: Type of skill - "coding-agent" or "domain-knowledge"
+
         Returns:
             WisdomDocument with ecosystem insights
         """
@@ -154,13 +201,13 @@ Provide actionable, practical guidance."""
         
         # Execute three research phases
         discovery = self._execute_research_phase(
-            topic, knowledge_context, "discovery"
+            topic, knowledge_context, "discovery", skill_type
         )
         ecosystem = self._execute_research_phase(
-            topic, knowledge_context, "ecosystem"
+            topic, knowledge_context, "ecosystem", skill_type
         )
         practices = self._execute_research_phase(
-            topic, knowledge_context, "practices"
+            topic, knowledge_context, "practices", skill_type
         )
         
         # Synthesize findings into structured wisdom document

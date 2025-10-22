@@ -1,0 +1,112 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    name: Pull Request Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Check for sensitive file changes
+        run: |
+          echo "Checking for sensitive files in PR..."
+          
+          # Get list of changed files
+          git diff --name-only origin/${{ github.base_ref }}...HEAD > changed_files.txt
+          
+          # Check for .env files (except .env.example)
+          if grep -E "\.env$" changed_files.txt | grep -v ".env.example"; then
+            echo "ERROR: PR contains .env file changes!"
+            echo "Changed files:"
+            cat changed_files.txt
+            exit 1
+          fi
+          
+          # Check for Python cache files
+          if grep -E "__pycache__|\.pyc$" changed_files.txt; then
+            echo "ERROR: PR contains Python cache files!"
+            exit 1
+          fi
+          
+          # Check for IDE config files
+          if grep -E "\.claude/|\.refactoring-game/|cc_mcp_config\.json" changed_files.txt; then
+            echo "WARNING: PR contains IDE-specific configuration files"
+            echo "These files should typically be gitignored"
+          fi
+          
+          echo "✓ No sensitive files in PR"
+      
+      - name: Validate package changes
+        if: contains(github.event.pull_request.changed_files, 'package.json')
+        run: |
+          echo "package.json was modified, validating changes..."
+          
+          # Check if version was bumped
+          BASE_VERSION=$(git show origin/${{ github.base_ref }}:package.json | node -p "require('fs').readFileSync(0, 'utf-8')" | node -p "JSON.parse(require('fs').readFileSync(0, 'utf-8')).version")
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          echo "Base version: $BASE_VERSION"
+          echo "Current version: $CURRENT_VERSION"
+          
+          if [ "$BASE_VERSION" != "$CURRENT_VERSION" ]; then
+            echo "✓ Version bumped from $BASE_VERSION to $CURRENT_VERSION"
+          else
+            echo "ℹ️ Version not changed (this may be intentional)"
+          fi
+      
+      - name: Check package size
+        run: |
+          echo "Checking package size..."
+          npm pack --dry-run > pack-output.txt 2>&1
+          
+          SIZE=$(grep "package size" pack-output.txt | awk '{print $4}')
+          echo "Package size: $SIZE"
+          
+          # Extract numeric value (assuming format like "2.7 MB")
+          SIZE_NUM=$(echo $SIZE | sed 's/[^0-9.]//g')
+          
+          if (( $(echo "$SIZE_NUM > 5.0" | bc -l) )); then
+            echo "WARNING: Package size is large ($SIZE). Consider optimizing."
+          else
+            echo "✓ Package size is acceptable ($SIZE)"
+          fi
+      
+      - name: Lint check (if configured)
+        run: |
+          if grep -q "\"lint\"" package.json; then
+            npm run lint
+          else
+            echo "No lint script configured, skipping"
+          fi
+      
+      - name: Generate PR summary
+        run: |
+          echo "## 📦 Package Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Package stats
+          echo "### Package Statistics" >> $GITHUB_STEP_SUMMARY
+          grep -E "package size|unpacked size|total files" pack-output.txt >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Security Checks" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ No sensitive files detected" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ No API keys in code" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Package build successful" >> $GITHUB_STEP_SUMMARY

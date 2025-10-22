@@ -1,0 +1,23 @@
+# Sync Orchestrator Dependencies
+# For bidirectional command-skill synchronization with Thoughtbox reasoning
+
+# MCP Client for Thoughtbox integration
+mcp[cli]>=1.0.0
+
+# Anthropic SDK for Task agents
+anthropic>=0.40.0
+
+# Data validation and serialization
+pydantic>=2.0.0
+
+# Async support
+aiofiles>=23.0.0
+
+# YAML parsing for frontmatter
+PyYAML>=6.0.0
+
+# Markdown parsing
+markdown-it-py>=3.0.0
+
+# JSON schema validation
+jsonschema>=4.0.0

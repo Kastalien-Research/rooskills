@@ -1,0 +1,35 @@
+# https://google-gemini.github.io/gemini-cli/docs/ llms.txt
+
+- [Gemini CLI File System Tools](https://google-gemini.github.io/gemini-cli/docs/tools/file-system.html): Comprehensive guide to file system tools for reading, writing, listing, searching, and modifying files.
+- [Gemini CLI Commands Reference](https://google-gemini.github.io/gemini-cli/docs/cli/commands.html): Complete guide to slash, at-symbol, and exclamation mark commands for managing Gemini CLI sessions and behavior.
+- [Gemini CLI Extensions Guide](https://google-gemini.github.io/gemini-cli/docs/extensions): Manage, create, and install extensions to expand Gemini CLI capabilities with prompts and commands.
+- [Gemini CLI Release Notes](https://google-gemini.github.io/gemini-cli/docs/changelogs): Track Gemini CLI updates, new features, extensions, and improvements across versions.
+- [Gemini CLI Tools Guide](https://google-gemini.github.io/gemini-cli/docs/tools): Built-in tools enabling Gemini model to access files, execute commands, and interact with environment.
+- [Gemini CLI Documentation Guide](https://google-gemini.github.io/gemini-cli/docs/cli): Complete reference for Gemini CLI commands, features, customization, and advanced configuration options.
+- [Gemini CLI Frequently Asked Questions](https://google-gemini.github.io/gemini-cli/docs/faq.html): Common questions and solutions for Gemini CLI troubleshooting, installation, configuration, and usage.
+- [Gemini CLI IDE Integration](https://google-gemini.github.io/gemini-cli/docs/ide-integration): Connect Gemini CLI with VS Code for workspace context awareness and native code diffing.
+- [Gemini CLI Troubleshooting Guide](https://google-gemini.github.io/gemini-cli/docs/troubleshooting.html): Solutions for common Gemini CLI issues, authentication errors, debugging tips, and exit codes.
+- [Gemini CLI Release Management](https://google-gemini.github.io/gemini-cli/docs/releases.html): Documentation for Gemini CLI release cadence, channels, promotion workflows, and manual release procedures.
+- [Gemini CLI Architecture Overview](https://google-gemini.github.io/gemini-cli/docs/architecture.html): High-level overview of Gemini CLI's core components, interaction flow, and design principles.
+- [Gemini CLI Getting Started](https://google-gemini.github.io/gemini-cli/docs/get-started): Install, authenticate, configure, and start using Gemini CLI from your terminal today.
+- [Gemini CLI Shell Tool](https://google-gemini.github.io/gemini-cli/docs/tools/shell.html): Execute shell commands and scripts with the Gemini CLI run_shell_command tool
+- [Gemini CLI Headless Mode](https://google-gemini.github.io/gemini-cli/docs/cli/headless.html): Run Gemini CLI programmatically without UI for automation and scripting workflows
+- [Enterprise Gemini CLI Configuration](https://google-gemini.github.io/gemini-cli/docs/cli/enterprise.html): Configure and manage Gemini CLI in enterprise environments with security policies and centralized settings.
+- [Gemini CLI OpenTelemetry Telemetry](https://google-gemini.github.io/gemini-cli/docs/cli/telemetry.html): Enable and configure OpenTelemetry observability for Gemini CLI with Google Cloud and local telemetry options.
+- [Gemini CLI Themes Guide](https://google-gemini.github.io/gemini-cli/docs/cli/themes.html): Customize Gemini CLI appearance with pre-defined themes or create custom color themes.
+- [Gemini CLI Terms Privacy](https://google-gemini.github.io/gemini-cli/docs/tos-privacy.html): Terms of service and privacy policies for Gemini CLI based on authentication method and account type.
+- [Gemini CLI Tools API](https://google-gemini.github.io/gemini-cli/docs/core/tools-api.html): Define, register, and execute tools extending Gemini model capabilities with local environment interaction.
+- [Gemini CLI Authentication Methods](https://google-gemini.github.io/gemini-cli/docs/get-started/authentication.html): Configure authentication for Gemini CLI using Google login, API keys, or Vertex AI.
+- [Gemini CLI Configuration Setup](https://google-gemini.github.io/gemini-cli/docs/get-started/configuration.html): Configure Gemini CLI behavior using environment variables, command-line arguments, and JSON settings files.
+- [Gemini CLI Memory Tool](https://google-gemini.github.io/gemini-cli/docs/tools/memory.html): Save and recall information across Gemini CLI sessions using save_memory tool.
+- [Page Not Found Error](https://google-gemini.github.io/gemini-cli/docs/gemini-ignore.html): 404 error page indicating requested file not found on server
+- [MCP Server Configuration Guide](https://google-gemini.github.io/gemini-cli/docs/tools/mcp-server.html): Configure and use Model Context Protocol servers with Gemini CLI to extend capabilities.
+- [Custom Commands Guide](https://google-gemini.github.io/gemini-cli/docs/cli/custom-commands.html): Create and manage reusable prompts as shortcuts in Gemini CLI with global and project-specific commands.
+- [Multi File Read Tool](https://google-gemini.github.io/gemini-cli/docs/tools/multi-file.html): Read multiple files using glob patterns, supporting text, images, PDFs, audio, and video formats.
+- [Gemini CLI Keyboard Shortcuts](https://google-gemini.github.io/gemini-cli/docs/cli/keyboard-shortcuts.html): Complete reference guide for all keyboard shortcuts available in Gemini CLI application.
+- [Gemini CLI Uninstall Guide](https://google-gemini.github.io/gemini-cli/docs/cli/uninstall.html): Instructions for uninstalling Gemini CLI using npx or global npm installation methods.
+- [Trusted Folders Security](https://google-gemini.github.io/gemini-cli/docs/cli/trusted-folders.html): Configure and manage folder trust settings for Gemini CLI security and project access control.
+- [GEMINI.md Context Files](https://google-gemini.github.io/gemini-cli/docs/cli/gemini-md.html): Configure project-specific instructions and context for Gemini AI model responses hierarchically.
+- [Web Fetch Tool Documentation](https://google-gemini.github.io/gemini-cli/docs/tools/web-fetch.html): Guide to using web_fetch tool for summarizing, comparing, and extracting information from web pages.
+- [Token Caching Cost Optimization](https://google-gemini.github.io/gemini-cli/docs/cli/token-caching.html): Gemini CLI automatically optimizes API costs through token caching for reusing context and instructions.
+- [Gemini CLI Authentication Setup](https://google-gemini.github.io/gemini-cli/docs/cli/authentication.html): Configure API authentication credentials for Gemini CLI tool access.

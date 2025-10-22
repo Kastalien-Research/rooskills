@@ -6,6 +6,8 @@ An NPM package and template that enables Roo Code users to leverage [Anthropic's
 
 [![npm version](https://badge.fury.io/js/@kastalien-research%2Frooskills.svg)](https://www.npmjs.com/package/@kastalien-research/rooskills)
 [![npm downloads](https://img.shields.io/npm/dm/@kastalien-research/rooskills.svg)](https://www.npmjs.com/package/@kastalien-research/rooskills)
+[![CI/CD](https://github.com/Kastalien-Research/rooskills/actions/workflows/ci.yml/badge.svg)](https://github.com/Kastalien-Research/rooskills/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
@@ -257,6 +259,39 @@ Skills in this repository use modular architecture principles:
 - Use environment variables for configuration
 - Follow clean architecture patterns
 - Document all functionality clearly
+
+## CI/CD & Security
+
+This package includes comprehensive CI/CD workflows with automated security checks:
+
+### Automated Workflows
+
+- **CI/CD Pipeline** - Runs on every push and PR
+  - Security validation (no exposed API keys, .env files, or secrets)
+  - Package integrity checks
+  - CLI functionality tests
+  - Automated package validation
+  
+- **PR Validation** - Validates pull requests
+  - Checks for sensitive file changes
+  - Package size monitoring
+  - Version change detection
+  
+- **Automated Publishing** - Publishes to npm
+  - Pre-publish security scans
+  - npm provenance support
+  - Automatic git tagging
+  - Package artifact archival
+
+### Security Features
+
+✅ **No secrets in repository** - All API keys are gitignored  
+✅ **Git history scanning** - Prevents accidental .env commits  
+✅ **Package validation** - Ensures no sensitive files in npm package  
+✅ **Python cache exclusion** - No `__pycache__` or `.pyc` files  
+✅ **IDE artifact filtering** - Excludes `.claude/`, `.refactoring-game/`
+
+See [`.github/workflows/README.md`](.github/workflows/README.md) for detailed CI/CD documentation.
 
 ## License
 

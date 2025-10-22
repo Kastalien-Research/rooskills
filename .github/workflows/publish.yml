@@ -1,0 +1,110 @@
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (leave empty to use package.json version)'
+        required: false
+        type: string
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run security checks
+        run: |
+          echo "Running pre-publish security checks..."
+          
+          # Check for .env in git history
+          if git log --all --full-history -- .env | grep -q commit; then
+            echo "ERROR: .env file found in git history!"
+            exit 1
+          fi
+          
+          # Check package for sensitive files
+          npm pack --dry-run > pack-output.txt 2>&1
+          if grep -E "\.env$|\.pyc$|__pycache__|\\.roo/mcp\\.json|cc_mcp_config" pack-output.txt | grep -v ".env.example"; then
+            echo "ERROR: Sensitive files found in package!"
+            cat pack-output.txt
+            exit 1
+          fi
+          
+          echo "✓ Security checks passed"
+      
+      - name: Bump version (if specified)
+        if: github.event.inputs.version != ''
+        run: |
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ github.event.inputs.version }}"
+          git push
+      
+      - name: Build package
+        run: npm pack
+      
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Get package info
+        id: package
+        run: |
+          echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
+          echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+      
+      - name: Create Git tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ steps.package.outputs.version }}" -m "Release v${{ steps.package.outputs.version }}"
+          git push origin "v${{ steps.package.outputs.version }}"
+      
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package-${{ steps.package.outputs.version }}
+          path: '*.tgz'
+          retention-days: 30
+      
+      - name: Post-publish summary
+        run: |
+          echo "## 🎉 Published to npm" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Package:** ${{ steps.package.outputs.name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.package.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Installation" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "npx ${{ steps.package.outputs.name }}@${{ steps.package.outputs.version }} init" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [npm package](https://www.npmjs.com/package/${{ steps.package.outputs.name }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [GitHub release](https://github.com/${{ github.repository }}/releases/tag/v${{ steps.package.outputs.version }})" >> $GITHUB_STEP_SUMMARY

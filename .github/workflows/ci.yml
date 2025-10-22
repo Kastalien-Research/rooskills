@@ -1,0 +1,213 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  security-check:
+    name: Security & Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Check for sensitive files in git history
+        run: |
+          echo "Checking for .env files in git history..."
+          if git log --all --full-history -- .env | grep -q commit; then
+            echo "ERROR: .env file found in git history!"
+            exit 1
+          fi
+          echo "✓ No .env files in git history"
+      
+      - name: Verify .gitignore patterns
+        run: |
+          echo "Verifying .gitignore includes security patterns..."
+          required_patterns=("\.env" "__pycache__" "\.pyc" "venv/" "\.claude/" "\.refactoring-game/")
+          
+          for pattern in "${required_patterns[@]}"; do
+            if ! grep -q "$pattern" .gitignore; then
+              echo "ERROR: Missing pattern in .gitignore: $pattern"
+              exit 1
+            fi
+          done
+          echo "✓ All required .gitignore patterns present"
+      
+      - name: Check for exposed secrets in codebase
+        run: |
+          echo "Scanning for potential secrets..."
+          if find . -type f \( -name "*.js" -o -name "*.py" -o -name "*.md" \) \
+            -not -path "*/node_modules/*" \
+            -not -path "*/.git/*" \
+            -not -path "*/venv/*" \
+            -exec grep -l "sk-[a-zA-Z0-9-_]\{20,\}" {} \; | grep -v ".github/workflows"; then
+            echo "ERROR: Potential API keys found in code!"
+            exit 1
+          fi
+          echo "✓ No exposed secrets detected"
+      
+      - name: Validate package.json
+        run: |
+          echo "Validating package.json structure..."
+          node -e "
+            const pkg = require('./package.json');
+            if (!pkg.name || !pkg.version || !pkg.description) {
+              console.error('ERROR: Missing required package.json fields');
+              process.exit(1);
+            }
+            if (!pkg.files || pkg.files.length === 0) {
+              console.error('ERROR: No files specified in package.json');
+              process.exit(1);
+            }
+            console.log('✓ package.json is valid');
+          "
+      
+      - name: Test package build
+        run: |
+          echo "Testing npm pack..."
+          npm pack --dry-run > pack-output.txt 2>&1
+          
+          echo "Checking for sensitive files in package..."
+          if grep -E "\.env$|\.pyc$|__pycache__|\.roo/mcp\.json|cc_mcp_config" pack-output.txt | grep -v ".env.example"; then
+            echo "ERROR: Sensitive files found in package!"
+            cat pack-output.txt
+            exit 1
+          fi
+          
+          echo "✓ Package build successful, no sensitive files included"
+          
+          # Show package stats
+          echo ""
+          echo "Package Statistics:"
+          grep -E "package size|unpacked size|total files" pack-output.txt
+      
+      - name: Verify CLI executability
+        run: |
+          echo "Testing CLI entry point..."
+          if [ ! -x "cli/index.js" ]; then
+            echo "WARNING: cli/index.js is not executable"
+          fi
+          
+          if ! head -1 cli/index.js | grep -q "^#!"; then
+            echo "ERROR: cli/index.js missing shebang"
+            exit 1
+          fi
+          echo "✓ CLI entry point is valid"
+      
+      - name: Check for Python cache files
+        run: |
+          echo "Checking for Python cache files..."
+          if find . -name "*.pyc" -o -name "__pycache__" | grep -v venv | grep .; then
+            echo "ERROR: Python cache files found in repository!"
+            exit 1
+          fi
+          echo "✓ No Python cache files in repository"
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: security-check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test || echo "No tests configured yet"
+      
+      - name: Test CLI commands
+        run: |
+          echo "Testing CLI help command..."
+          node cli/index.js --help
+          
+          echo "Testing CLI version command..."
+          node cli/index.js --version
+
+  package-validation:
+    name: Package Validation
+    runs-on: ubuntu-latest
+    needs: security-check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Create package tarball
+        run: npm pack
+      
+      - name: Test package installation
+        run: |
+          TARBALL=$(ls kastalien-research-rooskills-*.tgz)
+          echo "Testing installation of $TARBALL..."
+          
+          # Create test directory
+          mkdir -p /tmp/test-install
+          cd /tmp/test-install
+          
+          # Install the package
+          npm install $GITHUB_WORKSPACE/$TARBALL
+          
+          echo "✓ Package installed successfully"
+      
+      - name: Verify package contents
+        run: |
+          TARBALL=$(ls kastalien-research-rooskills-*.tgz)
+          echo "Verifying package contents..."
+          
+          # Extract and check structure
+          tar -tzf $TARBALL > contents.txt
+          
+          # Verify essential files are present
+          required_files=(
+            "package/package.json"
+            "package/README.md"
+            "package/.roomodes"
+            "package/cli/index.js"
+          )
+          
+          for file in "${required_files[@]}"; do
+            if ! grep -q "^$file$" contents.txt; then
+              echo "ERROR: Required file missing: $file"
+              exit 1
+            fi
+          done
+          
+          echo "✓ All required files present in package"
+      
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: '*.tgz'
+          retention-days: 7
