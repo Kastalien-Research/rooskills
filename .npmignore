@@ -10,6 +10,8 @@
 # IDE
 .vscode/
 .idea/
+.claude/
+.refactoring-game/
 
 # Test files
 test/
@@ -21,7 +23,10 @@ coding-agent-docs/
 # Build artifacts
 node_modules/
 *.pyc
+*.pyo
 __pycache__/
+venv/
+.venv/
 
 # Keep these for the package
 !.roo/
@@ -31,10 +36,24 @@ __pycache__/
 !README.md
 !agent_skills_spec.md
 
-# MCP config
+# Exclude sensitive files from .roo/
 .roo/mcp.json
+.roo/**/.env
+.roo/**/__pycache__/
+.roo/**/*.pyc
+.roo/**/*.pyo
+.roo/**/venv/
+
+# MCP config
 cc_mcp_config.json
 
-# Specs
+# Specs and logs
 specs/
 logs
+scripts/
+
+# Exclude generated skills (users should generate their own)
+.roo/skills/codebase-researcher/
+.roo/skills/cursor-skills/
+.roo/skills/gemini-cli/
+.roo/skills/spec-writer/
