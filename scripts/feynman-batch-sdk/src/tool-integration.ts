@@ -8,13 +8,13 @@ import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { FeynmanBatchExecutor, BatchExecutorOptions } from './batch-executor';
 import { spawn } from 'child_process';
 import * as path from 'path';
-
-interface FeynmanToolParams {
-  topic: string;
-  iterations?: number;
-  concurrency?: number;
-  background?: boolean;
-}
+import {
+  validateFeynmanToolParams,
+  ValidationError,
+  sanitizeErrorMessage,
+  type FeynmanToolParams,
+} from './validators';
+import { DEFAULT_COMMAND_TIMEOUT_MS, MAX_BUFFER_SIZE } from './constants';
 
 /**
  * Create a tool for running feynman batch research
@@ -26,16 +26,16 @@ export function createFeynmanTool() {
     parameters: {
       topic: {
         type: 'string',
-        description: 'Topic to research in depth',
+        description: 'Topic to research in depth (alphanumeric, hyphens, underscores only)',
       },
       iterations: {
         type: 'number',
-        description: 'Number of research iterations to run (default: 1)',
+        description: 'Number of research iterations to run (default: 1, max: 100)',
         default: 1,
       },
       concurrency: {
         type: 'number',
-        description: 'Number of parallel iterations (default: 1 for sequential)',
+        description: 'Number of parallel iterations (default: 1, max: 10)',
         default: 1,
       },
       background: {
@@ -45,14 +45,45 @@ export function createFeynmanTool() {
       },
     },
   })(async (params: FeynmanToolParams) => {
-    const { topic, iterations = 1, concurrency = 1, background = false } = params;
+    // SECURITY: Validate all inputs
+    let validatedParams;
+    try {
+      validatedParams = validateFeynmanToolParams(params);
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        return JSON.stringify({
+          status: 'error',
+          error: 'Validation failed',
+          message: error.message,
+          field: error.field,
+        }, null, 2);
+      }
+      throw error;
+    }
 
-    if (background) {
-      // Run in detached background process
-      return runInBackground(topic, iterations, concurrency);
-    } else {
-      // Run synchronously with progress updates
-      return runSynchronously(topic, iterations, concurrency);
+    try {
+      if (validatedParams.background) {
+        // Run in detached background process
+        return await runInBackground(
+          validatedParams.topic,
+          validatedParams.iterations,
+          validatedParams.concurrency,
+          validatedParams.timeout
+        );
+      } else {
+        // Run synchronously with progress updates
+        return await runSynchronously(
+          validatedParams.topic,
+          validatedParams.iterations,
+          validatedParams.concurrency
+        );
+      }
+    } catch (error) {
+      return JSON.stringify({
+        status: 'error',
+        error: 'Execution failed',
+        message: sanitizeErrorMessage(error),
+      }, null, 2);
     }
   });
 }
@@ -63,10 +94,12 @@ export function createFeynmanTool() {
 async function runInBackground(
   topic: string,
   iterations: number,
-  concurrency: number
+  concurrency: number,
+  timeout: number
 ): Promise<string> {
   const scriptPath = path.join(__dirname, '../../feynman-batch.sh');
   
+  // Build arguments array (validated inputs only)
   const args = [
     topic,
     iterations.toString(),
@@ -74,23 +107,34 @@ async function runInBackground(
     concurrency.toString(),
   ];
 
-  const child = spawn(scriptPath, args, {
-    detached: true,
-    stdio: 'ignore',
-    cwd: process.cwd(),
-  });
+  try {
+    const child = spawn(scriptPath, args, {
+      detached: true,
+      stdio: 'ignore',
+      cwd: process.cwd(),
+      timeout,
+      // Set resource limits
+      shell: false, // Explicitly no shell
+    });
 
-  child.unref();
+    child.unref();
 
-  return JSON.stringify({
-    status: 'started',
-    pid: child.pid,
-    topic,
-    iterations,
-    concurrency,
-    message: `Started ${iterations} iterations of sequential-feynman for "${topic}" in background (PID: ${child.pid})`,
-    checkStatus: 'Check feynman-batch-outputs/ for results and STATUS.json for progress',
-  }, null, 2);
+    return JSON.stringify({
+      status: 'started',
+      pid: child.pid,
+      topic,
+      iterations,
+      concurrency,
+      message: `Started ${iterations} iterations of sequential-feynman for "${topic}" in background (PID: ${child.pid})`,
+      checkStatus: 'Check feynman-batch-outputs/ for results and STATUS.json for progress',
+    }, null, 2);
+  } catch (error) {
+    return JSON.stringify({
+      status: 'error',
+      error: 'Failed to start background process',
+      message: sanitizeErrorMessage(error),
+    }, null, 2);
+  }
 }
 
 /**
@@ -106,31 +150,41 @@ async function runSynchronously(
     concurrency,
   };
 
-  const executor = new FeynmanBatchExecutor(topic, options);
+  try {
+    const executor = new FeynmanBatchExecutor(topic, options);
 
-  // Log progress events
-  executor.on('progress', (event) => {
-    console.log(`[${event.type}] ${event.message}`);
-  });
+    // Log progress events
+    executor.on('progress', (event) => {
+      console.log(`[${event.type}] ${event.message}`);
+    });
 
-  const result = await executor.execute();
+    const result = await executor.execute();
 
-  return JSON.stringify({
-    status: 'completed',
-    runId: result.runId,
-    topic: result.topic,
-    completed: result.completed,
-    failed: result.failed,
-    totalDuration: Math.round(result.totalDuration / 1000),
-    outputDir: result.outputDir,
-    reportPath: result.reportPath,
-    message: `Completed ${result.completed}/${iterations} iterations successfully`,
-    nextSteps: [
-      `Review report: ${result.reportPath}`,
-      `Check notebooks: ${result.outputDir}/iteration-*/artifacts/`,
-      `Integrate skills into .claude/skills/`,
-    ],
-  }, null, 2);
+    return JSON.stringify({
+      status: 'completed',
+      runId: result.runId,
+      topic: result.topic,
+      completed: result.completed,
+      failed: result.failed,
+      totalDuration: Math.round(result.totalDuration / 1000),
+      outputDir: result.outputDir,
+      reportPath: result.reportPath,
+      message: `Completed ${result.completed}/${iterations} iterations successfully`,
+      nextSteps: [
+        `Review report: ${result.reportPath}`,
+        `Check notebooks: ${result.outputDir}/iteration-*/artifacts/`,
+        `Integrate skills into .claude/skills/`,
+      ],
+    }, null, 2);
+  } catch (error) {
+    return JSON.stringify({
+      status: 'error',
+      error: 'Execution failed',
+      message: sanitizeErrorMessage(error),
+      topic,
+      iterations,
+    }, null, 2);
+  }
 }
 
 /**

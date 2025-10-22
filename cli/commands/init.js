@@ -3,12 +3,20 @@ const path = require('path');
 const chalk = require('chalk');
 const ora = require('ora');
 const inquirer = require('inquirer');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
+const { validatePath } = require('../utils/security');
 
 async function initCommand(options) {
   console.log(chalk.blue.bold('\n🚀 Initializing Roo Skills in your project...\n'));
 
-  const targetDir = path.resolve(options.dir);
+  // SECURITY: Validate and resolve target directory
+  let targetDir;
+  try {
+    targetDir = validatePath(options.dir || '.', process.cwd());
+  } catch (error) {
+    console.error(chalk.red('\n✗ Invalid directory:'), error.message);
+    process.exit(1);
+  }
   
   // Check if already initialized
   const roomodesPath = path.join(targetDir, '.roomodes');
@@ -33,55 +41,66 @@ async function initCommand(options) {
   const packageRoot = path.join(__dirname, '..', '..');
 
   try {
-    // Copy .roomodes file
-    let spinner = ora('Copying .roomodes configuration...').start();
-    await fs.copy(
-      path.join(packageRoot, '.roomodes'),
-      path.join(targetDir, '.roomodes')
-    );
-    spinner.succeed(chalk.green('✓ .roomodes configuration copied'));
+    // SECURITY: Ensure target directory exists and is writable
+    await fs.ensureDir(targetDir);
 
-    // Copy .roo/skills directory
-    spinner = ora('Copying skills directory...').start();
-    await fs.copy(
-      path.join(packageRoot, '.roo', 'skills'),
-      path.join(targetDir, '.roo', 'skills')
-    );
-    spinner.succeed(chalk.green('✓ Skills directory copied'));
+    // Copy files with proper error handling
+    const filesToCopy = [
+      {
+        src: path.join(packageRoot, '.roomodes'),
+        dest: path.join(targetDir, '.roomodes'),
+        name: '.roomodes configuration',
+      },
+      {
+        src: path.join(packageRoot, '.roo', 'skills'),
+        dest: path.join(targetDir, '.roo', 'skills'),
+        name: 'skills directory',
+      },
+      {
+        src: path.join(packageRoot, '.roo', 'commands'),
+        dest: path.join(targetDir, '.roo', 'commands'),
+        name: 'commands directory',
+      },
+      {
+        src: path.join(packageRoot, 'agent_skills_spec.md'),
+        dest: path.join(targetDir, 'agent_skills_spec.md'),
+        name: 'agent skills specification',
+      },
+      {
+        src: path.join(packageRoot, 'coding-agent-docs'),
+        dest: path.join(targetDir, 'coding-agent-docs'),
+        name: 'coding agent documentation',
+      },
+    ];
 
-    // Copy .roo/commands directory
-    spinner = ora('Copying commands directory...').start();
-    await fs.copy(
-      path.join(packageRoot, '.roo', 'commands'),
-      path.join(targetDir, '.roo', 'commands')
-    );
-    spinner.succeed(chalk.green('✓ Commands directory copied'));
+    for (const file of filesToCopy) {
+      const spinner = ora(`Copying ${file.name}...`).start();
+      try {
+        await fs.copy(file.src, file.dest, {
+          overwrite: true,
+          errorOnExist: false,
+        });
+        spinner.succeed(chalk.green(`✓ ${file.name} copied`));
+      } catch (error) {
+        spinner.fail(chalk.red(`✗ Failed to copy ${file.name}`));
+        throw new Error(`Failed to copy ${file.name}: ${error.message}`);
+      }
+    }
 
     // Copy .env.example if it doesn't exist
     const envExamplePath = path.join(targetDir, '.env.example');
-    if (!fs.existsSync(envExamplePath)) {
-      spinner = ora('Creating .env.example...').start();
-      await fs.copy(
-        path.join(packageRoot, '.env.example'),
-        envExamplePath
-      );
-      spinner.succeed(chalk.green('✓ .env.example created'));
+    if (!(await fs.pathExists(envExamplePath))) {
+      const spinner = ora('Creating .env.example...').start();
+      try {
+        await fs.copy(
+          path.join(packageRoot, '.env.example'),
+          envExamplePath
+        );
+        spinner.succeed(chalk.green('✓ .env.example created'));
+      } catch (error) {
+        spinner.warn(chalk.yellow('⚠ Could not create .env.example'));
+      }
     }
-
-    // Copy agent_skills_spec.md
-    spinner = ora('Copying agent skills specification...').start();
-    await fs.copy(
-      path.join(packageRoot, 'agent_skills_spec.md'),
-      path.join(targetDir, 'agent_skills_spec.md')
-    );
-    spinner.succeed(chalk.green('✓ Agent skills specification copied'));
-    // Copy coding-agent-docs directory
-    spinner = ora('Copying coding agent documentation...').start();
-    await fs.copy(
-      path.join(packageRoot, 'coding-agent-docs'),
-      path.join(targetDir, 'coding-agent-docs')
-    );
-    spinner.succeed(chalk.green('✓ Coding agent documentation copied'));
 
 
     // Check for Python and offer to install dependencies
@@ -96,7 +115,7 @@ async function initCommand(options) {
       ]);
 
       if (installPython) {
-        spinner = ora('Installing Python dependencies...').start();
+        const spinner = ora('Installing Python dependencies...').start();
         try {
           const requirementsPath = path.join(
             targetDir,
@@ -107,15 +126,21 @@ async function initCommand(options) {
             'requirements.txt'
           );
           
-          execSync(`pip install -r "${requirementsPath}"`, {
+          // SECURITY FIX: Use execFileSync instead of execSync to prevent shell injection
+          execFileSync('pip', ['install', '-r', requirementsPath], {
             cwd: targetDir,
-            stdio: 'pipe'
+            stdio: 'pipe',
+            timeout: 120000, // 2 minute timeout
           });
           spinner.succeed(chalk.green('✓ Python dependencies installed'));
         } catch (error) {
           spinner.fail(chalk.yellow('⚠ Failed to install Python dependencies'));
           console.log(chalk.yellow('  You can install them manually later with:'));
-          console.log(chalk.gray(`  pip install -r .roo/skills/scripts/agent-skill-generator/requirements.txt`));
+          console.log(chalk.gray('  pip install -r .roo/skills/scripts/agent-skill-generator/requirements.txt'));
+          
+          if (error.code === 'ETIMEDOUT') {
+            console.log(chalk.yellow('  (Installation timed out - may need to run manually)'));
+          }
         }
       }
     }

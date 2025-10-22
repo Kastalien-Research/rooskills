@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-01-22
+
+### Added
+
+#### Security Framework
+- **Input Validation System** - Comprehensive validation for all user inputs
+  - URL validation with protocol whitelist (http/https only)
+  - Skill name validation (alphanumeric + hyphens/underscores)
+  - Path validation to prevent traversal attacks
+  - Parameter sanitization for safe command execution
+- **Environment Validation** - Required configuration checking on startup
+  - Type validation for all environment variables
+  - Format validation (API keys, timeouts, etc.)
+  - Clear error messages with troubleshooting tips
+- **Security Documentation**
+  - `SECURITY.md` - Complete security guide with best practices
+  - `CODE_REVIEW.md` - Detailed vulnerability analysis (21 issues documented)
+  - Security checklist for contributors
+
+#### New Utilities
+- `cli/utils/security.js` - JavaScript validation functions (460+ lines)
+- `cli/utils/config-validator.js` - Environment variable validator (240+ lines)
+- `scripts/feynman-batch-sdk/src/validators.ts` - TypeScript validators (270+ lines)
+- `scripts/feynman-batch-sdk/src/constants.ts` - Security constants (290+ lines)
+
+### Changed
+- **Enhanced .env.example** - Comprehensive configuration documentation with examples
+- **Strict TypeScript Mode** - Enabled full strict checking in tsconfig.json
+- **Command Execution** - All CLI commands now use safe execution patterns
+- **API Calls** - Added timeout protection for Python Thoughtbox client
+
+### Security
+- **Fixed command injection vulnerabilities** (CRITICAL) in `cli/commands/generate.js` and `cli/commands/init.js`
+- **Replaced `execSync` with `execFileSync`** - Prevents shell interpretation and command injection
+- **Added timeout protection** - All operations have configurable timeouts (default: 30s)
+- **Implemented input validation** - All user inputs validated before processing
+- **Added path validation** - Prevents path traversal attacks (../, ~, etc.)
+- **Safe error messages** - Production errors don't expose sensitive data
+- **Environment variable validation** - Required keys checked on startup
+
+### Fixed
+- Command injection vulnerability in skill generation (CRITICAL)
+- Command injection vulnerability in initialization (CRITICAL)
+- Missing input validation across all user inputs (CRITICAL)
+- Unprotected environment variables (HIGH)
+- Unsafe file operations (HIGH)
+- Missing API timeouts in Python client (HIGH)
+- Magic numbers extracted to constants (MEDIUM)
+
 ## [1.2.1] - 2025-10-22
 
 ### Fixed
@@ -87,11 +136,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- **1.3.0** - Security framework and comprehensive hardening
 - **1.2.1** - Fix npm README display (republish)
 - **1.2.0** - Sequential Feynman Batch Executor + Enhanced skill generation
 - **1.1.4** - CI/CD and security improvements
 - **1.1.3** - Initial npm package release
 
+[1.3.0]: https://github.com/Kastalien-Research/rooskills/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/Kastalien-Research/rooskills/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Kastalien-Research/rooskills/compare/v1.1.4...v1.2.0
 [1.1.4]: https://github.com/Kastalien-Research/rooskills/compare/v1.1.3...v1.1.4
