@@ -1,2 +1,7 @@
 .DS_Store
 
+.env
+create-llmstxt-py/.env
+cc_mcp_config.json
+.roo/mcp.json
+coding-agent-docs

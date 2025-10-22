@@ -1,111 +1,271 @@
-# Skills
-Skills are folders of instructions, scripts, and resources that Claude loads dynamically to improve performance on specialized tasks. Skills teach Claude how to complete specific tasks in a repeatable way, whether that's creating documents with your company's brand guidelines, analyzing data using your organization's specific workflows, or automating personal tasks.
+# Roo Code Skills Template
 
-For more information, check out:
-- [What are skills?](https://support.claude.com/en/articles/12512176-what-are-skills)
-- [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude)
-- [How to create custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills)
-- [Equipping agents for the real world with Agent Skills](https://anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+**Bring Anthropic's Agent Skills to Roo Code**
 
-# About This Repository
+This repository is a template that enables Roo Code users to leverage [Anthropic's Agent Skills system](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) - the same powerful capability available in Claude Code. It provides:
 
-This repository contains example skills that demonstrate what's possible with Claude's skills system. These examples range from creative applications (art, music, design) to technical tasks (testing web apps, MCP server generation) to enterprise workflows (communications, branding, etc.).
+- **Skills Integration** - Use Anthropic's Agent Skills format in Roo Code through custom modes
+- **Automated Generation** - Create new skills from any documentation URL
+- **Pre-built Skills** - Ready-to-use skills for development, AI automation, and documentation
 
-Each skill is self-contained in its own directory with a `SKILL.md` file containing the instructions and metadata that Claude uses. Browse through these examples to get inspiration for your own skills or to understand different patterns and approaches.
+## What are Agent Skills?
 
-The example skills in this repo are open source (Apache 2.0). We've also included the document creation & editing skills that power [Claude's document capabilities](https://www.anthropic.com/news/create-files) under the hood in the [`document-skills/`](./document-skills/) folder. These are source-available, not open source, but we wanted to share these with developers as a reference for more complex skills that are actively used in a production AI application.
+Agent Skills are modular instruction sets that enhance Claude's capabilities for specific tasks. Originally developed for Claude Code, this template brings that same functionality to Roo Code by:
 
-**Note:** These are reference examples for inspiration and learning. They showcase general-purpose capabilities rather than organization-specific workflows or sensitive content.
+1. Converting Agent Skills into Roo Code custom modes via [`.roomodes`](.roomodes)
+2. Organizing skills in [`.roo/skills/`](.roo/skills/) for clean project structure
+3. Providing automated tools to generate new skills from documentation
 
-## Disclaimer
+This means Roo Code users get the same skill-based enhancements that Claude Code users enjoy.
 
-**These skills are provided for demonstration and educational purposes only.** While some of these capabilities may be available in Claude, the implementations and behaviors you receive from Claude may differ from what is shown in these examples. These examples are meant to illustrate patterns and possibilities. Always test skills thoroughly in your own environment before relying on them for critical tasks.
+## Features
 
-# Example Skills
+### 🤖 Automated Skill Generator
+The repository includes a powerful skill generation system that can automatically create comprehensive skills from documentation URLs using:
+- **Firecrawl** for web scraping and content extraction
+- **OpenAI GPT-4o-mini** for knowledge summarization
+- **Claude Agent SDK (Anthropic)** for ecosystem research and best practices
+- **Exa MCP** for supplementary research
 
-This repository includes a diverse collection of example skills demonstrating different capabilities:
+### 📚 Pre-built Skills
+All skills are located in [`.roo/skills/`](.roo/skills/) and registered as custom modes in [`.roomodes`](.roomodes):
 
-## Creative & Design
-- **algorithmic-art** - Create generative art using p5.js with seeded randomness, flow fields, and particle systems
-- **canvas-design** - Design beautiful visual art in .png and .pdf formats using design philosophies
-- **slack-gif-creator** - Create animated GIFs optimized for Slack's size constraints
+#### Development & Technical
+- **mcp-builder** - Create high-quality MCP (Model Context Protocol) servers for integrating external services
+- **model-enhancement-mcp** - Advanced MCP server examples including analogical reasoning and sequential thinking
+- **document-skills** - Comprehensive document creation and manipulation (DOCX, PDF, PPTX, XLSX)
 
-## Development & Technical
-- **artifacts-builder** - Build complex claude.ai HTML artifacts using React, Tailwind CSS, and shadcn/ui components
-- **mcp-server** - Guide for creating high-quality MCP servers to integrate external APIs and services
-- **webapp-testing** - Test local web applications using Playwright for UI verification and debugging
+#### AI & Automation
+- **lindy-expert** - Expertise in Lindy AI agent creation and management platform for business process automation
 
-## Enterprise & Communication
-- **brand-guidelines** - Apply Anthropic's official brand colors and typography to artifacts
-- **internal-comms** - Write internal communications like status reports, newsletters, and FAQs
-- **theme-factory** - Style artifacts with 10 pre-set professional themes or generate custom themes on-the-fly
+#### Development Tools
+- **create-llmstxt-py** - Python tool for generating llms.txt documentation from websites
+- **skill-creator** - Meta-skill for creating new effective skills with best practices
+- **template-skill** - Basic template for starting new skills
 
-## Meta Skills
-- **skill-creator** - Guide for creating effective skills that extend Claude's capabilities
-- **template-skill** - A basic template to use as a starting point for new skills
+#### Documentation
+- **architecture** - Architecture documentation for the skill generation system
 
-# Document Skills
+## Using This Template
 
-The `document-skills/` subdirectory contains skills that Anthropic developed to help Claude create various document file formats. These skills demonstrate advanced patterns for working with complex file formats and binary data:
+### For Roo Code Users
 
-- **docx** - Create, edit, and analyze Word documents with support for tracked changes, comments, formatting preservation, and text extraction
-- **pdf** - Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms
-- **pptx** - Create, edit, and analyze PowerPoint presentations with support for layouts, templates, charts, and automated slide generation
-- **xlsx** - Create, edit, and analyze Excel spreadsheets with support for formulas, formatting, data analysis, and visualization
+1. **Fork or Clone** this repository to your Roo Code workspace
+2. **Copy `.env.example`** (if provided) to `.env` and add your API keys
+3. **Import the `.roomodes` configuration** into your Roo Code settings
+4. Skills in [`.roo/skills/`](.roo/skills/) will be available as custom modes
 
-**Important Disclaimer:** These document skills are point-in-time snapshots and are not actively maintained or updated. Versions of these skills ship pre-included with Claude. They are primarily intended as reference examples to illustrate how Anthropic approaches developing more complex skills that work with binary file formats and document structures.
+### For Claude Code Users
 
-# Try in Claude Code, Claude.ai, and the API
+While this template is designed for Roo Code, the skills themselves are compatible with Claude Code's native Agent Skills system:
 
-## Claude Code
-You can register this repository as a Claude Code Plugin marketplace by running the following command in Claude Code:
+1. Skills can be used directly from [Anthropic's official skills repository](https://github.com/anthropics/skills)
+2. Or you can copy individual skills from this template's `.roo/skills/` directory
+
+## Quick Start
+
+### Prerequisites
+
+1. **Environment Variables** - Create a `.env` file in the project root:
+```bash
+# Firecrawl API Key (get from https://firecrawl.dev)
+FIRECRAWL_API_KEY=your_key_here
+
+# OpenAI API Key (get from https://platform.openai.com)
+OPENAI_API_KEY=your_key_here
+
+# Anthropic API Key (get from https://console.anthropic.com)
+ANTHROPIC_API_KEY=your_key_here
+
+# Optional: Exa API Key for enhanced research
+EXA_API_KEY=your_key_here
 ```
-/plugin marketplace add anthropics/skills
+
+2. **Python Dependencies** - Install required packages:
+```bash
+pip install -r .roo/skills/scripts/agent-skill-generator/requirements.txt
 ```
 
-After installing the plugin, you can use the skill by just mentioning it. For instance, if you install the document-skills plugin from the marketplace, you can ask Claude Code to do something like: "use the pdf skill to extract the form fields from path/to/some-file.pdf"
+### Generating a New Skill
 
-## Claude.ai
+Use the skill generator to create a new skill from any documentation URL:
 
-These example skills are all already available to paid plans in Claude.ai. 
+```bash
+./.roo/skills/scripts/commands/generate-skill.sh "https://docs.example.com/" "skill-name" --max-urls 15
+```
 
-To use any skill from this repository or upload custom skills, follow the instructions in [Using skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude#h_a4222fa77b).
+**Parameters:**
+- `URL` - Documentation URL to process (required)
+- `SKILL_NAME` - Skill identifier in kebab-case (optional, auto-generated from URL)
+- `--max-urls N` - Maximum number of URLs to process (default: 20)
+- `--output-dir DIR` - Output directory (default: .roo/skills/SKILL_NAME)
+- `--verbose` - Enable verbose logging
+- `--help` - Show help message
 
-## Claude API
+**Example:**
+```bash
+# Generate a FastAPI skill
+./.roo/skills/scripts/commands/generate-skill.sh "https://fastapi.tiangolo.com" "fastapi-expert" --max-urls 30
 
-You can use Anthropic's pre-built skills, and upload custom skills, via the Claude API. See the [Skills API Quickstart](https://docs.claude.com/en/api/skills-guide#creating-a-skill) for more.
+# Generate with auto-detected name
+./.roo/skills/scripts/commands/generate-skill.sh "https://docs.stripe.com/"
+```
 
-# Creating a Basic Skill
+### Generation Process
 
-Skills are simple to create - just a folder with a `SKILL.md` file containing YAML frontmatter and instructions. You can use the **template-skill** in this repository as a starting point:
+The skill generator runs through 5 automated phases:
 
-```markdown
+1. **Knowledge Extraction** - Scrapes and summarizes documentation using Firecrawl + OpenAI
+2. **Ecosystem Research** - Analyzes positioning and best practices using Claude + Exa
+3. **Skill Synthesis** - Generates structured SKILL.md with comprehensive guidance
+4. **File Writing** - Creates all skill files and reference documentation
+5. **Mode Registration** - Registers the skill as a mode in `.roomodes`
+
+### Output Structure
+
+Each generated skill includes:
+```
+.roo/skills/skill-name/
+├── SKILL.md                          # Main skill file with YAML frontmatter
+├── LICENSE.txt                       # License information
+└── references/
+    ├── api_documentation.md          # Complete API/documentation content
+    └── documentation_index.md        # Curated index of key resources
+```
+
+## Using Skills in Roo Code
+
+### Roo Code Plugin Marketplace
+Register this repository as a plugin marketplace:
+```bash
+/plugin marketplace add username/rooskills
+```
+
+### Manual Skill Usage
+Skills are automatically loaded from `.roomodes` and can be activated by:
+1. Mentioning the skill name in your conversation
+2. Switching to the skill's mode using the mode selector
+3. Referencing skills in task delegation
+
+## Validation
+
+Validate skill integration:
+```bash
+python .roo/skills/scripts/validate_mode_skill_integration.py
+```
+
+This checks:
+- SKILL.md file exists and is properly formatted
+- YAML frontmatter is valid
+- No duplicate slugs in `.roomodes`
+- File sizes are within limits (<500 lines)
+- Skills are properly registered
+
+## Project Structure
+
+```
+rooskills/
+├── .env                              # Environment variables (git-ignored)
+├── .roomodes                         # Mode configuration file
+├── README.md                         # This file
+├── agent_skills_spec.md              # Skills specification
+└── .roo/
+    └── skills/                       # All skills directory
+        ├── architecture/             # Architecture documentation
+        ├── create-llmstxt-py/        # Python tool for llms.txt generation
+        ├── document-skills/          # Document creation (DOCX, PDF, PPTX, XLSX)
+        ├── lindy-expert/             # Lindy AI automation platform skill
+        ├── mcp-builder/              # MCP server creation skill
+        ├── model-enhancement-mcp/    # Advanced MCP examples
+        ├── skill-creator/            # Meta-skill for creating skills
+        ├── template-skill/           # Basic skill template
+        └── scripts/                  # Skill generation scripts
+            ├── agent-skill-generator/
+            │   ├── config.py         # Configuration management
+            │   ├── orchestrator.py   # Main CLI entry point
+            │   ├── llms_generator.py # Knowledge extraction
+            │   ├── ecosystem_researcher.py
+            │   ├── skill_creator.py  # Skill synthesis
+            │   └── mode_configurator.py
+            ├── commands/
+            │   └── generate-skill.sh # Shell wrapper
+            └── validate_mode_skill_integration.py
+```
+
+## Architecture
+
+The skill generator follows a modular, pipeline-based architecture:
+
+- **Configuration** - Environment-based settings (never hardcoded secrets)
+- **Knowledge Extraction** - Firecrawl + OpenAI for documentation processing
+- **Research** - Claude + Exa for ecosystem analysis
+- **Synthesis** - Structured skill creation with best practices
+- **Validation** - Comprehensive integration checks
+
+See [`architecture/`](architecture/) for detailed documentation.
+
+## Best Practices
+
+### When Creating Skills
+- Keep SKILL.md under 500 lines - move detailed content to references/
+- Use clear, descriptive frontmatter (name, description)
+- Provide specific examples and guidelines
+- Include integration patterns and common pitfalls
+- Never hardcode secrets or environment-specific values
+
+### When Generating Skills
+- Start with smaller `--max-urls` values (10-15) for faster results
+- Review generated content before committing
+- Customize the SKILL.md to add organization-specific knowledge
+- Test the skill thoroughly before deploying
+
+## Contributing
+
+Skills in this repository use modular architecture principles:
+- Files should be < 500 lines
+- Use environment variables for configuration
+- Follow clean architecture patterns
+- Document all functionality clearly
+
+## License
+
+See individual skill directories for licensing information. Most skills use MIT License unless otherwise specified.
+
+## Resources & References
+
+### Anthropic's Agent Skills
+- [Official Agent Skills Repository](https://github.com/anthropics/skills) - Original skills for Claude Code
+- [What are Skills?](https://support.claude.com/en/articles/12512176-what-are-skills) - Understanding the skills system
+- [Equipping Agents for the Real World](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills) - Engineering blog post
+- [Creating Custom Skills](https://support.claude.com/en/articles/12512198-creating-custom-skills) - Official guide
+
+### This Template
+- [Architecture Documentation](architecture/) - Skill generation system design
+- [Validation Scripts](.roo/skills/scripts/) - Testing and validation tools
+- [Skill Creator Skill](.roo/skills/skill-creator/) - Meta-skill for creating new skills
+
+## Compatibility
+
+### Agent Skills Format
+This template uses Anthropic's Agent Skills format (YAML frontmatter + Markdown instructions), ensuring skills are:
+- **Portable** - Work in both Roo Code and Claude Code (with appropriate configuration)
+- **Standard** - Follow Anthropic's established patterns and best practices
+- **Maintainable** - Compatible with future skill format updates
+
+### Roo Code Integration
+Skills integrate with Roo Code through:
+- **Custom Modes** - Each skill becomes a mode in [`.roomodes`](.roomodes)
+- **Skill References** - Skills are loaded dynamically via `skill_ref` paths
+- **Override Strategy** - Skill content overrides default mode instructions
+
+## Support
+
+For issues, questions, or contributions:
+1. Check existing [documentation](architecture/)
+2. Review [validation scripts](.roo/skills/scripts/)
+3. Consult the [skill creator skill](.roo/skills/skill-creator/)
+4. Reference [Anthropic's official skills documentation](https://github.com/anthropics/skills)
+
 ---
-name: my-skill-name
-description: A clear description of what this skill does and when to use it
----
 
-# My Skill Name
-
-[Add your instructions here that Claude will follow when this skill is active]
-
-## Examples
-- Example usage 1
-- Example usage 2
-
-## Guidelines
-- Guideline 1
-- Guideline 2
-```
-
-The frontmatter requires only two fields:
-- `name` - A unique identifier for your skill (lowercase, hyphens for spaces)
-- `description` - A complete description of what the skill does and when to use it
-
-The markdown content below contains the instructions, examples, and guidelines that Claude will follow. For more details, see [How to create custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills).
-
-# Partner Skills
-
-Skills are a great way to teach Claude how to get better at using specific pieces of software. As we see awesome example skills from partners, we may highlight some of them here:
-
-- **Notion** - [Notion Skills for Claude](https://www.notion.so/notiondevs/Notion-Skills-for-Claude-28da4445d27180c7af1df7d8615723d0)
+**Note:** This is a template repository that bridges Anthropic's Agent Skills system with Roo Code. Skills are compatible with the official Agent Skills format and can be shared between Claude Code and Roo Code environments.
