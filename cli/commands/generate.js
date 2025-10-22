@@ -56,8 +56,11 @@ async function generateCommand(url, skillName, options) {
     
     console.log(chalk.yellow('\nTroubleshooting:'));
     console.log('  • Ensure .env file exists with required API keys');
+    console.log(chalk.gray('    → cp .env.example .env && nano .env'));
     console.log('  • Check that Python dependencies are installed');
-    console.log('  • Verify the documentation URL is accessible\n');
+    console.log(chalk.gray('    → pip install -r .roo/skills/scripts/agent-skill-generator/requirements.txt'));
+    console.log('  • Verify the documentation URL is accessible');
+    console.log(chalk.gray('    → Test the URL in your browser first\n'));
     
     process.exit(1);
   }

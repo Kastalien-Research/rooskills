@@ -1,6 +1,6 @@
 {
   "name": "@kastalien-research/rooskills",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Bring Anthropic's Agent Skills to Roo Code - CLI tool for setting up skills in your project",
   "main": "cli/index.js",
   "bin": {
