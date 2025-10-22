@@ -17,23 +17,30 @@ Automatically create integrated Roo Code skills from web documentation using AI-
 ## Usage
 
 ```
-/generate-skill $URL [$SKILL_NAME] [--max-urls $MAX_URLS] [--use-feynman $USE_FEYNMAN]
+/generate-skill $URL1 [$URL2 $URL3 ...] [--max-urls $MAX_URLS] [--use-feynman $USE_FEYNMAN] [--parallel $N]
 ```
 
 ### Arguments
 
-- **`$URL`** (required) - Documentation URL to process (e.g., `https://fastapi.tiangolo.com`)
+- **`$URL1, $URL2, ...`** (required) - One or more documentation URLs to process
 - **`$SKILL_NAME`** (optional) - Skill identifier in kebab-case (auto-generated from URL if not provided)
-- **`$MAX_URLS`** (optional) - Maximum URLs to scrape (default: `20`)
+- **`$MAX_URLS`** (optional) - Maximum URLs to scrape per product (default: `20`)
 - **`$USE_FEYNMAN`** (optional) - Use Sequential Feynman for deep understanding (default: `true`)
+- **`--parallel $N`** (optional) - Maximum concurrent subagents (default: `3`)
 
 ### Quick Examples
 
 ```bash
-# Basic usage - generate skill from FastAPI docs
+# Basic usage - generate skill from single URL
 /generate-skill https://fastapi.tiangolo.com
 
-# Custom skill name
+# Multiple URLs with parallel processing (one subagent per URL)
+/generate-skill https://cursor.com https://windsurf.com https://cline.bot
+
+# Control parallelism
+/generate-skill https://cursor.com https://windsurf.com --parallel 5
+
+# Custom skill name (single URL only)
 /generate-skill https://supabase.com supabase-expert
 
 # Limit URLs and skip deep analysis
@@ -41,7 +48,30 @@ Automatically create integrated Roo Code skills from web documentation using AI-
 
 # Deep dive with Sequential Feynman
 /generate-skill https://langchain.readthedocs.io langchain-agent --max-urls 50 --use-feynman true
+
+# Batch process coding agents with viability checks
+/generate-skill \
+  https://cursor.com \
+  https://windsurf.com \
+  https://cline.bot \
+  https://aider.chat \
+  --parallel 4 \
+  --max-urls 20
 ```
+
+### Multi-URL Processing
+
+When multiple URLs are provided:
+1. **One subagent per URL** - Each URL gets a dedicated Claude Agent SDK subagent
+2. **Parallel execution** - Subagents run concurrently (up to `--parallel` limit)
+3. **Independent pipelines** - Each subagent owns the complete Phase 0-7 pipeline
+4. **Viability filtering** - Non-viable products get reports, viable ones get skills
+5. **Aggregated results** - Summary shows all skills generated and reports created
+
+**Performance:**
+- 3 URLs with `--parallel 3`: ~5-10 minutes total (vs 15-30 minutes sequential)
+- Respects rate limits through controlled concurrency
+- Failed URLs don't block others
 
 ---
 
@@ -61,6 +91,79 @@ echo "Checking environment..."
 ```
 
 If any required keys are missing, stop execution and prompt user to configure them.
+
+---
+
+## Unix Composability
+
+The enhanced pipeline follows Unix philosophy: atomic scripts that can be composed via stdin/stdout.
+
+### Atomic Scripts
+
+Each phase is implemented as a standalone script:
+
+```bash
+# Phase 0: Viability Evaluation
+./scripts/agent-skill-generator/evaluate-viability.py <URL> > viability.json
+
+# Phase 0b: Report Generation (for non-viable)
+cat viability.json | ./scripts/agent-skill-generator/generate-report.py > report.md
+
+# Phase 1-5: Skill Generation
+cat viability.json | ./scripts/agent-skill-generator/generate-skill.py > skill-result.json
+
+# Phase 6: Mapping Specification
+./scripts/agent-skill-generator/generate-mapping-spec.py \
+  --viability viability.json \
+  --skill-dir ./skill-name \
+  --output MAPPING.md
+```
+
+### Pipeline Composition Examples
+
+**Example 1: Evaluate → Generate or Report**
+
+```bash
+# Evaluate viability first
+./evaluate-viability.py https://cursor.com | tee viability.json
+
+# If viable, generate skill; else generate report
+if [ $(jq -r '.viable' viability.json) = "true" ]; then
+  cat viability.json | ./generate-skill.py | tee skill-result.json
+  cat skill-result.json | ./generate-mapping-spec.py > MAPPING.md
+else
+  cat viability.json | ./generate-report.py > cursor-report.md
+fi
+```
+
+**Example 2: Batch Processing with Filtering**
+
+```bash
+# Process multiple URLs, filter for viable ones
+cat urls.txt | \
+  xargs -I {} ./evaluate-viability.py {} | \
+  jq -r 'select(.viable==true) | .url' | \
+  xargs -I {} ./generate-skill.py {}
+```
+
+**Example 3: Pure Unix Pipeline**
+
+```bash
+# One-liner: evaluate → generate (if viable) → map
+./evaluate-viability.py https://cursor.com | \
+  tee viability.json | \
+  jq -r 'select(.viable==true)' | \
+  ./generate-skill.py | \
+  ./generate-mapping-spec.py
+```
+
+### Benefits of Composability
+
+1. **Modularity** - Run phases independently for testing/debugging
+2. **Reusability** - Combine scripts in different ways for different workflows
+3. **Observability** - Pipe through `tee` or `jq` to inspect intermediate results
+4. **Flexibility** - Easy to add custom processing between phases
+5. **Testability** - Each script can be unit tested with sample JSON
 
 ---
 
@@ -85,6 +188,67 @@ echo "📚 Source: $URL"
 echo "🔢 Max URLs: $MAX_URLS"
 echo "🧠 Use Feynman: $USE_FEYNMAN"
 ```
+
+### Phase 0: Viability Evaluation (Optional but Recommended)
+
+**Objective:** Assess if the product has sufficient extensibility mechanisms before expensive scraping
+
+```bash
+echo "
+═══════════════════════════════════════
+Phase 0: Viability Evaluation
+═══════════════════════════════════════
+"
+
+# Quick viability check using evaluate-viability.py
+if [ -f "$AGENT_GEN_DIR/evaluate-viability.py" ]; then
+  echo "🔍 Evaluating viability of $URL..."
+
+  if python3 "$AGENT_GEN_DIR/evaluate-viability.py" "$URL" > "$TEMP_DIR/viability.json" 2>&1; then
+    VIABLE=$(jq -r '.viable' "$TEMP_DIR/viability.json")
+    CONFIDENCE=$(jq -r '.confidence' "$TEMP_DIR/viability.json")
+    PRODUCT_NAME=$(jq -r '.product_name' "$TEMP_DIR/viability.json")
+
+    echo "📊 Viability Assessment:"
+    echo "   Product: $PRODUCT_NAME"
+    echo "   Viable: $VIABLE"
+    echo "   Confidence: $CONFIDENCE"
+
+    if [ "$VIABLE" != "true" ]; then
+      echo "❌ Product not viable for Skills mapping"
+      echo "   Generating viability report instead..."
+
+      cat "$TEMP_DIR/viability.json" | \
+        python3 "$AGENT_GEN_DIR/generate-report.py" \
+        > "$TEMP_DIR/${SKILL_NAME}-viability-report.md"
+
+      echo "✅ Report generated: $TEMP_DIR/${SKILL_NAME}-viability-report.md"
+      echo ""
+      echo "This product lacks sufficient extensibility mechanisms."
+      echo "See the report for details and recommendations."
+      exit 0
+    fi
+
+    echo "✅ Viable for Skills mapping, proceeding with generation..."
+  else
+    echo "⚠️  Viability check failed, continuing with generation anyway..."
+  fi
+else
+  echo "⚠️  evaluate-viability.py not found, skipping viability check"
+fi
+```
+
+**What This Phase Does:**
+1. Uses Exa API to quickly research product extensibility
+2. Analyzes if product has plugin/extension/rule systems
+3. Returns structured assessment with confidence score
+4. If not viable: generates report and exits early
+5. If viable: proceeds with normal skill generation
+
+**Benefits:**
+- Saves time by avoiding generation for non-viable products
+- Produces actionable reports for products without extensibility
+- Confidence score helps prioritize which products to tackle
 
 ### Phase 1: Environment Validation
 
@@ -288,7 +452,60 @@ echo "✅ Mode configuration updated"
 - Skill file under 500 lines
 - Valid markdown structure
 
-### Phase 6: Validation and Output
+### Phase 6: Mapping Specification Generation (Optional)
+
+**Objective:** Generate mapping specification for products with extensibility mechanisms
+
+```bash
+echo "
+═══════════════════════════════════════
+Phase 6: Mapping Specification
+═══════════════════════════════════════
+"
+
+# Check if viability assessment exists and product is viable
+if [ -f "$TEMP_DIR/viability.json" ]; then
+  MAPPING_STRATEGY=$(jq -r '.mapping_strategy // "n/a"' "$TEMP_DIR/viability.json")
+
+  if [ "$MAPPING_STRATEGY" != "n/a" ] && [ "$MAPPING_STRATEGY" != "impossible" ]; then
+    echo "🗺️  Generating mapping specification..."
+    echo "   Strategy: $MAPPING_STRATEGY"
+
+    # Generate mapping spec
+    python3 "$AGENT_GEN_DIR/generate-mapping-spec.py" \
+      --viability "$TEMP_DIR/viability.json" \
+      --skill-dir "$SKILL_DIR" \
+      --output "$SKILL_DIR/MAPPING.md" \
+      2>&1 | tee -a "$LOG_FILE"
+
+    if [ -f "$SKILL_DIR/MAPPING.md" ]; then
+      echo "✅ Mapping specification created: $SKILL_DIR/MAPPING.md"
+      echo ""
+      echo "This spec documents how to map Claude Skills to this product's"
+      echo "extensibility system with estimated ${MAPPING_STRATEGY} approach."
+    else
+      echo "⚠️  Mapping spec generation failed"
+    fi
+  else
+    echo "ℹ️  No mapping strategy available, skipping mapping spec"
+  fi
+else
+  echo "ℹ️  No viability assessment found, skipping mapping spec"
+fi
+```
+
+**What This Phase Does:**
+1. Checks if product has extensibility mechanisms (from Phase 0)
+2. Generates detailed mapping specification (MAPPING.md)
+3. Documents conversion strategy and requirements
+4. Provides implementation plan and examples
+5. Similar to the Cursor Skills mapping spec
+
+**Output:**
+- `MAPPING.md` - Comprehensive guide for converting Skills to product format
+- Includes conversion scripts, validation approach, success metrics
+
+### Phase 7: Validation and Output
 
 ```bash
 echo "
@@ -578,608 +795,3 @@ Skill generation succeeds when:
 - Documenting third-party APIs
 - Creating domain expertise modes
 - Building specialized development skills
----
-description: Transform web documentation into integrated Roo Code skills with automated knowledge extraction, ecosystem research, and mode registration
----
-
-# /generate-skill - Automated Skill Generation
-
-Transform any web documentation into a complete, production-ready Roo Code skill with structured guidance, references, and automatic mode registration.
-
-**Shell Script**: [`scripts/commands/generate-skill.sh`](../../scripts/commands/generate-skill.sh)
-
----
-
-## Usage
-
-```bash
-/generate-skill <URL> [SKILL_NAME] [OPTIONS]
-```
-
-### Quick Examples
-
-```bash
-# Auto-detect skill name from URL
-/generate-skill "https://fastapi.tiangolo.com"
-
-# Specify custom skill name
-/generate-skill "https://fastapi.tiangolo.com" "fastapi-developer"
-
-# With custom options
-/generate-skill "https://fastapi.tiangolo.com" "fastapi-dev" --max-urls 30 --verbose
-
-# With custom output directory
-/generate-skill "https://fastapi.tiangolo.com" --output-dir "./skills/backend/fastapi"
-```
-
----
-
-## Arguments
-
-| Argument | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `URL` | Yes | Documentation URL to process | `https://fastapi.tiangolo.com` |
-| `SKILL_NAME` | No | Skill identifier in kebab-case (auto-generated if omitted) | `fastapi-developer` |
-
-## Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `--max-urls N` | Integer | 20 | Maximum number of URLs to process |
-| `--use-feynman` | Boolean | true | Enable Feynman technique for documentation |
-| `--output-dir DIR` | Path | `SKILL_NAME` | Output directory for generated files |
-| `--verbose` | Flag | false | Enable verbose logging for debugging |
-| `--help` | Flag | - | Show help message and exit |
-
----
-
-## Prerequisites
-
-### Required Environment Variables
-
-The command requires three API keys to be set in your environment:
-
-```bash
-export FIRECRAWL_API_KEY="fc-your-key-here"
-export OPENAI_API_KEY="sk-your-key-here"  
-export ANTHROPIC_API_KEY="sk-ant-your-key-here"
-```
-
-**Where to Get Keys**:
-- **Firecrawl**: https://firecrawl.dev (web scraping and content extraction)
-- **OpenAI**: https://platform.openai.com (content summarization)
-- **Anthropic**: https://console.anthropic.com (research and skill synthesis)
-
-**Optional**: `EXA_API_KEY` for enhanced ecosystem research via Exa MCP
-
-### Using .env Files
-
-Create `.env` in project root:
-
-```bash
-# Required Keys
-FIRECRAWL_API_KEY=fc-xxx...
-OPENAI_API_KEY=sk-xxx...
-ANTHROPIC_API_KEY=sk-ant-xxx...
-
-# Optional Keys
-EXA_API_KEY=your-exa-key
-```
-
-**Security**: Add `.env` to `.gitignore` to prevent accidental commits.
-
-### System Requirements
-
-- **Bash**: 4.0 or higher
-- **Python**: 3.10 or higher
-- **Dependencies**: Auto-installed from requirements.txt
-
-### Verification
-
-```bash
-# Verify API keys are set
-echo $FIRECRAWL_API_KEY
-echo $OPENAI_API_KEY
-echo $ANTHROPIC_API_KEY
-
-# Check Python version
-python3 --version
-
-# Test script execution
-./scripts/commands/generate-skill.sh --help
-```
-
----
-
-## Workflow Phases
-
-The command orchestrates a 5-phase pipeline coordinated by [`orchestrator.py`](../../scripts/agent-skill-generator/orchestrator.py).
-
-### Phase 1: Knowledge Extraction
-
-**Module**: [`llms_generator.py`](../../scripts/agent-skill-generator/llms_generator.py)
-
-**Process**:
-1. Maps all URLs on the documentation site using Firecrawl
-2. Scrapes content in batches (markdown format)
-3. Generates titles and descriptions using OpenAI
-4. Creates llms.txt (summary) and llms-full.txt (complete content)
-
-**Duration**: 2-5 minutes depending on URL count
-
-**Output**: `KnowledgeBundle` with structured documentation
-
-**Example Output**:
-```
-Phase 1: Extracting documentation knowledge...
-✓ Mapped 47 URLs
-✓ Processed 23 pages
-✓ Generated summaries
-```
-
-### Phase 2: Ecosystem Research
-
-**Module**: [`ecosystem_researcher.py`](../../scripts/agent-skill-generator/ecosystem_researcher.py)
-
-**Process**:
-1. Analyzes what the tool is and who uses it
-2. Maps ecosystem positioning and alternatives
-3. Identifies best practices and common pitfalls
-4. Uses Claude Agent SDK with optional Exa MCP integration
-
-**Duration**: 1-3 minutes
-
-**Output**: `WisdomDocument` with strategic insights
-
-**Example Output**:
-```
-Phase 2: Researching ecosystem and best practices...
-✓ Analyzed positioning
-✓ Identified alternatives
-✓ Extracted best practices
-```
-
-### Phase 3: Skill Synthesis
-
-**Module**: [`skill_creator.py`](../../scripts/agent-skill-generator/skill_creator.py)
-
-**Process**:
-1. Combines knowledge bundle and wisdom document
-2. Extracts core capabilities and use cases
-3. Structures content into SKILL.md sections
-4. Generates YAML frontmatter with metadata
-5. Creates reference documentation files
-
-**Duration**: 1-2 minutes
-
-**Output**: `SkillBundle` with SKILL.md and references
-
-**Example Output**:
-```
-Phase 3: Creating SKILL.md and references...
-✓ Synthesized skill structure
-✓ Generated YAML frontmatter
-✓ Created reference files
-```
-
-### Phase 4: File Writing
-
-**Module**: [`orchestrator.py:_write_skill_files()`](../../scripts/agent-skill-generator/orchestrator.py)
-
-**Process**:
-1. Creates skill directory structure
-2. Writes SKILL.md with complete content
-3. Writes reference files to `references/` subdirectory
-4. Generates LICENSE.txt file
-
-**Duration**: <1 second
-
-**Output Structure**:
-```
-skill-name/
-├── SKILL.md                      # Main skill definition
-├── LICENSE.txt                   # License information
-└── references/                   # Supporting documentation
-    ├── api_documentation.md      # Full API reference
-    └── documentation_index.md    # Quick lookup index
-```
-
-**Example Output**:
-```
-Phase 4: Writing skill files...
-✓ Created directory structure
-✓ Wrote SKILL.md (12,456 bytes)
-✓ Wrote 2 reference files
-✓ Generated LICENSE.txt
-```
-
-### Phase 5: Mode Registration
-
-**Module**: [`mode_configurator.py`](../../scripts/agent-skill-generator/mode_configurator.py)
-
-**Process**:
-1. Validates SKILL.md structure and frontmatter
-2. Checks for duplicate mode slugs in `.roomodes`
-3. Adds mode entry to configuration
-4. Runs integration validation checks
-5. Reports warnings or errors
-
-**Duration**: <1 second
-
-**Output**: `ModeRegistrationResult` with validation report
-
-**Example Output**:
-```
-Phase 5: Registering mode in .roomodes...
-✓ Mode registered successfully
-
-Validation Results:
-  ✓ YAML frontmatter valid
-  ✓ Required fields present
-  ✓ File patterns valid
-  ✓ Mode slug unique
-```
-
----
-
-## Common Use Cases
-
-### API Framework Documentation
-
-Generate skills for web frameworks:
-
-```bash
-# FastAPI
-/generate-skill "https://fastapi.tiangolo.com"
-
-# NestJS  
-/generate-skill "https://docs.nestjs.com" "nestjs-developer"
-
-# Django
-/generate-skill "https://docs.djangoproject.com" "django-expert" --max-urls 40
-```
-
-### Database Documentation
-
-Create database administration skills:
-
-```bash
-# PostgreSQL
-/generate-skill "https://www.postgresql.org/docs/current" "postgresql-admin" --max-urls 60
-
-# MongoDB
-/generate-skill "https://docs.mongodb.com"
-```
-
-### Cloud Platform Documentation
-
-Build cloud service skills:
-
-```bash
-# Google Cloud Firestore
-/generate-skill "https://cloud.google.com/firestore/docs" "firestore-developer" --output-dir "./cloud-skills/gcp"
-
-# AWS Lambda
-/generate-skill "https://docs.aws.amazon.com/lambda" "aws-lambda-expert"
-```
-
-### Testing Framework Documentation
-
-Generate testing tool skills:
-
-```bash
-# pytest
-/generate-skill "https://docs.pytest.org" "pytest-expert"
-
-# Jest
-/generate-skill "https://jestjs.io/docs" "jest-testing"
-```
-
-### Batch Processing Multiple Skills
-
-```bash
-#!/bin/bash
-# batch-generate.sh - Generate multiple skills in sequence
-
-URLS=(
-    "https://fastapi.tiangolo.com:fastapi-dev"
-    "https://flask.palletsprojects.com:flask-dev"
-    "https://docs.djangoproject.com:django-dev"
-)
-
-for entry in "${URLS[@]}"; do
-    IFS=':' read -r url name <<< "$entry"
-    /generate-skill "$url" "$name"
-done
-```
-
----
-
-## Troubleshooting
-
-### Missing Environment Variables
-
-**Error**:
-```
-✗ Error: Missing required environment variables:
-  - FIRECRAWL_API_KEY
-  - OPENAI_API_KEY
-```
-
-**Solution**:
-```bash
-# Set missing variables
-export FIRECRAWL_API_KEY="fc-your-key"
-export OPENAI_API_KEY="sk-your-key"
-export ANTHROPIC_API_KEY="sk-ant-your-key"
-
-# Or source from .env
-set -a
-source .env
-set +a
-```
-
-### Python Dependencies Missing
-
-**Error**:
-```
-⚠ Warning: Some Python dependencies are missing
-```
-
-**Solution**: Dependencies are auto-installed, but you can manually install:
-```bash
-pip install -r scripts/agent-skill-generator/requirements.txt
-```
-
-### Rate Limiting Issues
-
-**Error**:
-```
-429 Too Many Requests
-```
-
-**Solution**: Reduce processing speed:
-```bash
-# Lower max URLs
-/generate-skill "https://example.com" --max-urls 10
-
-# Process in batches with delays
-/generate-skill "https://site1.com" && sleep 60
-/generate-skill "https://site2.com"
-```
-
-### Invalid SKILL.md Generated
-
-**Error**:
-```
-Invalid or missing YAML frontmatter in SKILL.md
-```
-
-**Solution**: Validate and regenerate:
-```bash
-# Check validation
-python -m scripts.agent-skill-generator.orchestrator validate skill-name/SKILL.md
-
-# Regenerate with verbose logging
-/generate-skill "https://example.com" "skill-name" --verbose
-```
-
-### Scraping Failures
-
-**Error**:
-```
-Failed to scrape URL: Connection timeout
-```
-
-**Solution**:
-1. Verify URL is accessible in browser
-2. Check for rate limiting or geo-restrictions
-3. Try with fewer pages: `--max-urls 5`
-4. Enable verbose mode to see detailed errors: `--verbose`
-
-### Permission Errors
-
-**Error**:
-```
-Permission denied: ./scripts/commands/generate-skill.sh
-```
-
-**Solution**:
-```bash
-chmod +x scripts/commands/generate-skill.sh
-```
-
-### Enable Debug Logging
-
-For detailed troubleshooting, enable verbose mode:
-
-```bash
-/generate-skill "https://example.com" --verbose
-```
-
-This will show:
-- Detailed API calls and responses
-- File operations and validations
-- Internal processing steps
-- Error stack traces
-
----
-
-## Output Artifacts
-
-After successful execution, you'll have:
-
-### 1. Skill Directory
-
-```
-skill-name/
-├── SKILL.md                      # Main skill definition
-├── LICENSE.txt                   # MIT license
-└── references/                   # Supporting documentation
-    ├── api_documentation.md      # Full API reference
-    ├── documentation_index.md    # Quick lookup index
-    └── best_practices.md         # Common patterns and anti-patterns
-```
-
-### 2. Mode Registration
-
-The skill is automatically registered in `.roomodes`:
-
-```json
-{
-  "slug": "skill-name",
-  "name": "Skill Display Name",
-  "icon": "📘",
-  "description": "Generated description",
-  "roleDefinition": "You are an expert in...",
-  "customInstructions": "Detailed guidance...",
-  "systemPromptFile": "skill-name/SKILL.md"
-}
-```
-
-### 3. Validation Report
-
-A validation report confirms:
-- ✓ YAML frontmatter is valid
-- ✓ All required fields are present
-- ✓ File patterns are correctly formatted
-- ✓ Mode slug is unique
-- ✓ Integration passes all checks
-
----
-
-## Best Practices
-
-### URL Selection
-
-Choose documentation URLs that:
-- Have comprehensive, well-organized content
-- Include API references and examples
-- Are actively maintained
-- Cover common use cases
-
-**Good Examples**:
-- `https://fastapi.tiangolo.com` (complete framework docs)
-- `https://docs.pytest.org` (testing framework)
-- `https://www.postgresql.org/docs` (database docs)
-
-**Avoid**:
-- Blog posts or tutorials (not comprehensive)
-- Outdated documentation
-- Sites with heavy JavaScript (hard to scrape)
-
-### Processing Limits
-
-**Default (20 URLs)**: Good for most documentation sites
-**Small Sites (5-10 URLs)**: Quick skills for focused tools
-**Large Sites (30-50 URLs)**: Comprehensive frameworks requiring detailed coverage
-
-**Warning**: Processing >50 URLs may hit rate limits or timeout
-
-### Customization
-
-After generation, you can:
-1. Edit `SKILL.md` to refine guidance
-2. Add more reference files
-3. Update YAML frontmatter
-4. Modify custom instructions
-
-**Tip**: Run validation after edits:
-```bash
-python -m scripts.agent-skill-generator.orchestrator validate skill-name/SKILL.md
-```
-
----
-
-## Integration with Roo Code
-
-### Using Generated Skills
-
-Once generated and registered, use the skill in Roo Code:
-
-1. **Switch to Mode**: `/mode skill-name`
-2. **View Capabilities**: Check the SKILL.md for available commands
-3. **Access References**: Reference files are auto-loaded as context
-
-### Skill Structure
-
-Each generated skill follows SPARC principles:
-
-- **S**pecification: Clear role definition and capabilities
-- **P**seudocode: Step-by-step workflow guidance
-- **A**rchitecture: Modular structure with references
-- **R**efinement: Iterative improvement through validation
-- **C**ompletion: Production-ready with no hardcoded secrets
-
-### File Restrictions
-
-Generated skills respect mode-specific file restrictions:
-- Documentation skills: Can edit `.md` files only
-- Developer skills: Can edit relevant code files
-- Admin skills: Can edit configuration files
-
-Restrictions are defined in the YAML frontmatter's `allowedFilePatterns`.
-
----
-
-## Related Documentation
-
-- **Implementation Guide**: [`scripts/agent-skill-generator/README.md`](../../scripts/agent-skill-generator/README.md)
-- **System Guide**: [`scripts/agent-skill-generator/SYSTEM_GUIDE.md`](../../scripts/agent-skill-generator/SYSTEM_GUIDE.md)
-- **Architecture**: [`architecture/agent-skill-generator-architecture.md`](../../architecture/agent-skill-generator-architecture.md)
-- **Process Flow**: [`architecture/agent-skill-generator-process.md`](../../architecture/agent-skill-generator-process.md)
-- **Shell Script**: [`scripts/commands/generate-skill.sh`](../../scripts/commands/generate-skill.sh)
-- **Full Documentation**: [`scripts/commands/generate-skill.md`](../../scripts/commands/generate-skill.md)
-
----
-
-## What This Command Does
-
-1. **Extracts Knowledge**: Scrapes and summarizes documentation using Firecrawl + OpenAI
-2. **Researches Ecosystem**: Analyzes positioning, alternatives, and best practices using Claude + Exa
-3. **Synthesizes Skills**: Generates SKILL.md with structured guidance and examples
-4. **Creates References**: Builds supporting documentation files for quick lookup
-5. **Registers Modes**: Automatically integrates skills into `.roomodes` configuration
-
----
-
-## Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| 0 | Success - skill generated and registered |
-| 1 | Missing arguments or environment variables |
-| >1 | Python orchestrator failure (see logs with `--verbose`) |
-
----
-
-## Success Criteria
-
-You've successfully generated a skill when:
-
-- [ ] All 5 phases complete without errors
-- [ ] SKILL.md file is created with valid YAML frontmatter
-- [ ] Reference files are generated in `references/` directory
-- [ ] LICENSE.txt is present
-- [ ] Mode is registered in `.roomodes`
-- [ ] Validation passes all checks
-- [ ] Skill can be activated in Roo Code via `/mode skill-name`
-
----
-
-## Quick Reference
-
-**Command**: `/generate-skill <URL> [SKILL_NAME] [OPTIONS]`
-
-**Purpose**: Transform web documentation into integrated Roo Code skills
-
-**Time Investment**: 5-10 minutes per skill (automated)
-
-**Payoff**: Production-ready, validated skill with automatic mode registration
-
-**Best For**: API frameworks, databases, cloud platforms, testing tools
-
-**Artifacts Created**:
-- `$SKILL_NAME/SKILL.md` - Main skill definition
-- `$SKILL_NAME/references/` - Supporting documentation
-- `.roomodes` entry - Mode registration

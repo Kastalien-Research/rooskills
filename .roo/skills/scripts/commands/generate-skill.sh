@@ -39,7 +39,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../../../../" && pwd)"
-ORCHESTRATOR_MODULE=".roo.skills.scripts.agent-skill-generator.orchestrator"
+ORCHESTRATOR_MODULE="agent-skill-generator.orchestrator"
+PYTHON_PATH="${PROJECT_ROOT}/.roo/skills/scripts"
 
 # Default values
 DEFAULT_MAX_URLS=20
@@ -368,6 +369,9 @@ main() {
     echo ""
     
     cd "${PROJECT_ROOT}"
+    
+    # Set PYTHONPATH to allow module imports
+    export PYTHONPATH="${PYTHON_PATH}:${PYTHONPATH:-}"
     
     if "${python_cmd[@]}"; then
         # Success

@@ -75,6 +75,14 @@ async function initCommand(options) {
       path.join(targetDir, 'agent_skills_spec.md')
     );
     spinner.succeed(chalk.green('✓ Agent skills specification copied'));
+    // Copy coding-agent-docs directory
+    spinner = ora('Copying coding agent documentation...').start();
+    await fs.copy(
+      path.join(packageRoot, 'coding-agent-docs'),
+      path.join(targetDir, 'coding-agent-docs')
+    );
+    spinner.succeed(chalk.green('✓ Coding agent documentation copied'));
+
 
     // Check for Python and offer to install dependencies
     if (options.install) {
