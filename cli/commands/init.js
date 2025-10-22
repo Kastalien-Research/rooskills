@@ -49,6 +49,14 @@ async function initCommand(options) {
     );
     spinner.succeed(chalk.green('✓ Skills directory copied'));
 
+    // Copy .roo/commands directory
+    spinner = ora('Copying commands directory...').start();
+    await fs.copy(
+      path.join(packageRoot, '.roo', 'commands'),
+      path.join(targetDir, '.roo', 'commands')
+    );
+    spinner.succeed(chalk.green('✓ Commands directory copied'));
+
     // Copy .env.example if it doesn't exist
     const envExamplePath = path.join(targetDir, '.env.example');
     if (!fs.existsSync(envExamplePath)) {
@@ -109,7 +117,8 @@ async function initCommand(options) {
     console.log(chalk.cyan('Next steps:'));
     console.log('  1. Copy .env.example to .env and add your API keys');
     console.log('  2. Import .roomodes into your Roo Code settings');
-    console.log('  3. Start using skills in your Roo Code workspace\n');
+    console.log('  3. Use slash commands from .roo/commands/ in Roo Code');
+    console.log('  4. Start using skills in your Roo Code workspace\n');
     console.log(chalk.gray('Generate a new skill:'));
     console.log(chalk.gray('  rooskills generate <documentation-url> [skill-name]\n'));
     console.log(chalk.gray('List available skills:'));

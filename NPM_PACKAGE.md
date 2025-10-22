@@ -144,6 +144,9 @@ your-project/
 ├── .env.example                      # Environment variables template
 ├── agent_skills_spec.md              # Skills specification
 └── .roo/
+    ├── commands/                     # Slash commands for Roo Code
+    │   ├── generate-skill.md         # /generate-skill command
+    │   └── sequential-feynman.md     # /sequential-feynman command
     └── skills/                       # All skills and tools
         ├── mcp-builder/
         ├── document-skills/
